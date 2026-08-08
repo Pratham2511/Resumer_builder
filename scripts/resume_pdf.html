@@ -19,7 +19,6 @@
             print-color-adjust: exact;
         }
 
-        /* ── Page Containers ── */
         .page {
             width: 210mm;
             height: 297mm;
@@ -31,8 +30,8 @@
         }
         .page:last-child { page-break-after: auto; }
 
-        /* ── Header ── */
-        .header { margin-bottom: 4px; }
+        /* Header */
+        .header { margin-bottom: 6px; }
         .header h1 {
             font-size: 28pt;
             font-weight: 700;
@@ -40,13 +39,7 @@
             text-transform: uppercase;
             color: #2E2C2C;
             line-height: 1.15;
-            margin-bottom: 2px;
-        }
-        .header-subtitle {
-            font-size: 12pt;
-            font-weight: 400;
-            color: #2E2C2C;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .contact-row {
             display: flex;
@@ -55,7 +48,6 @@
             color: #666464;
             flex-wrap: wrap;
             line-height: 1.5;
-            margin-bottom: 2px;
         }
         .contact-item {
             display: inline-flex;
@@ -68,7 +60,7 @@
             flex-shrink: 0;
         }
 
-        /* ── Section ── */
+        /* Section */
         .section { margin-bottom: 0; }
         .section-title {
             font-size: 12pt;
@@ -82,7 +74,7 @@
             margin-top: 10px;
         }
 
-        /* ── About ── */
+        /* About */
         .about-text {
             font-size: 9.5pt;
             color: #2E2C2C;
@@ -91,7 +83,7 @@
             margin-top: 6px;
         }
 
-        /* ── Entry ── */
+        /* Entry */
         .entry { margin-top: 6px; }
         .entry-header {
             display: flex;
@@ -131,7 +123,7 @@
             line-height: 1.45;
         }
 
-        /* ── Skills ── */
+        /* Skills */
         .skills-list {
             font-size: 9.5pt;
             color: #2E2C2C;
@@ -145,7 +137,6 @@
             margin-right: 3px;
         }
 
-        /* ── Screen preview ── */
         @media screen {
             body {
                 display: flex;
@@ -165,7 +156,6 @@
 
     <div class="header">
         <h1>Pratham P Pansare</h1>
-        <div class="header-subtitle">Software Developer</div>
         <div class="contact-row">
             <span class="contact-item">
                 <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
@@ -184,7 +174,7 @@
 
     <div class="section">
         <h3 class="section-title">About Me</h3>
-        <p class="about-text">Dedicated Software Developer with hands-on experience in building scalable, full-stack applications and AI-driven platforms. Proficient in modern web frameworks and relational databases, with a strong ability to translate complex technical requirements into user-centric solutions. Passionate about software architecture, clean code, and continuous learning.</p>
+        <p class="about-text">Aspiring software developer with hands-on experience building scalable, full-stack applications and AI-driven platforms. Proficient in modern web frameworks, relational databases, and machine learning integration, with a strong ability to translate complex technical requirements into user-centric solutions. Passionate about software architecture, clean code, and continuous learning.</p>
     </div>
 
     <div class="section">
@@ -212,11 +202,11 @@
     <div class="section">
         <h3 class="section-title">Skills</h3>
         <div class="skills-list">
-            <div class="skills-category"><strong>Languages:</strong> Python, JavaScript, CSS, HTML, SQL</div>
-            <div class="skills-category"><strong>Libraries/Frameworks:</strong> React, Next.js, Flask, Tailwind CSS, Bootstrap</div>
-            <div class="skills-category"><strong>Databases:</strong> MySQL, PostgreSQL, SQLite, Supabase</div>
-            <div class="skills-category"><strong>Cloud &amp; DevOps:</strong> AWS, GitHub Actions, Vercel</div>
-            <div class="skills-category"><strong>Tools:</strong> Figma, Canva, Google Colab, GitHub</div>
+            <div class="skills-category"><strong>Languages:</strong> Python, JavaScript, TypeScript, CSS, HTML, SQL</div>
+            <div class="skills-category"><strong>Libraries/Frameworks:</strong> React, Next.js, FastAPI, Flask, Tailwind CSS, Bootstrap, Prisma</div>
+            <div class="skills-category"><strong>Databases:</strong> MySQL, PostgreSQL, SQLite, Supabase, Redis</div>
+            <div class="skills-category"><strong>Cloud &amp; DevOps:</strong> AWS, Cloudflare R2, GitHub Actions, Vercel, Hugging Face Spaces</div>
+            <div class="skills-category"><strong>Tools:</strong> TensorFlow, D3.js, Figma, Canva, Google Colab, GitHub, Capacitor</div>
         </div>
     </div>
 
@@ -224,18 +214,16 @@
         <h3 class="section-title">Projects</h3>
         <div class="entry">
             <div class="entry-header">
-                <div class="entry-title">ShetVaidya (Plant Disease Analyzer)</div>
-                <div class="entry-meta">React, FastAPI, PostgreSQL, TensorFlow</div>
+                <div class="entry-title">ShetVaidya — AI Crop Disease Analyzer &amp; Medicine Verifier</div>
+                <div class="entry-meta">React, FastAPI, TensorFlow, PostgreSQL</div>
             </div>
             <div class="entry-desc">
                 <ul>
-                    <li>Built a production-grade, location-aware AI crop disease analyzer and medicine verification platform aimed at empowering farmers with immediate diagnostic tools.</li>
-                    <li>Developed an accurate machine learning inference microservice utilizing a TensorFlow MobileNetV2 model to analyze uploaded plant images and identify specific diseases.</li>
-                    <li>Engineered a robust and scalable backend using FastAPI, integrating JWT-based HttpOnly cookies for secure authentication and Google OAuth for user login.</li>
-                    <li>Configured Cloudflare R2 object storage to securely handle and validate image uploads, enforcing strict 5MB size limits and MIME type verifications.</li>
-                    <li>Built a responsive frontend application with React and Vite, featuring protected routes and a ZXing barcode scanner for medicine batch verification.</li>
-                    <li>Established a complete CI/CD pipeline using GitHub Actions to automate static checks, builds, and containerized deployment across Vercel and Hugging Face Spaces.</li>
-                    <li>Integrated PostgreSQL for structured relational data and Redis for caching, ensuring high-performance data retrieval and session management.</li>
+                    <li>Built a production-grade, location-aware crop disease analyzer and medicine verification platform (ShetVaidya = "field doctor" in Marathi) to empower farmers with immediate diagnostic tools.</li>
+                    <li>Developed a TensorFlow MobileNetV2 inference microservice with V2.0 prediction safety — dedicated non-leaf/garbage class rejection and confidence gating for out-of-scope images.</li>
+                    <li>Engineered a microservice architecture (frontend, backend, ML service) with FastAPI, JWT HttpOnly cookies, Google OAuth, and API rate limiting on auth and batch verification flows.</li>
+                    <li>Configured Cloudflare R2 object storage for secure image uploads (5MB limit, MIME validation) and integrated ZXing barcode scanning for medicine batch verification with non-public batch codes.</li>
+                    <li>Established CI/CD via GitHub Actions for containerized deployment across Vercel (frontend) and Hugging Face Spaces (backend + ML), with PostgreSQL and Redis for structured data and caching.</li>
                 </ul>
             </div>
         </div>
@@ -247,54 +235,48 @@
     <div class="section">
         <div class="entry">
             <div class="entry-header">
-                <div class="entry-title">Khatawali Records</div>
-                <div class="entry-meta">React, Supabase, Bootstrap</div>
+                <div class="entry-title">Khatawali Records — Credit/Debit Ledger App</div>
+                <div class="entry-meta">React, Supabase, Capacitor, Bootstrap</div>
             </div>
             <div class="entry-desc">
                 <ul>
-                    <li>Engineered a mobile-first, comprehensive credit and debit ledger application designed for small business owners and individuals to manage financial transactions.</li>
-                    <li>Packaged the application natively for Android using Capacitor, enabling seamless mobile features like an in-app contact importer and deep linking capabilities.</li>
-                    <li>Designed a scalable PostgreSQL database schema on Supabase, leveraging Row Level Security (RLS) policies and Supabase Auth to guarantee user data privacy.</li>
-                    <li>Implemented robust category-wise separation, allowing users to track the same person across multiple independent ledger categories seamlessly.</li>
-                    <li>Developed an advanced filtering and search dashboard supporting date-range queries, year/month summaries, and instant person-lookup by name or phone number.</li>
-                    <li>Integrated high-value export functionalities utilizing jsPDF and PapaParse, allowing users to download per-person transaction histories as PDFs or Excel files.</li>
-                    <li>Enhanced application security and user experience by implementing biometric fingerprint locking mechanisms configurable directly within the app settings.</li>
+                    <li>Engineered a mobile-first credit/debit ledger application for small business owners and individuals, with category-separated tracking for the same person across independent ledgers.</li>
+                    <li>Packaged natively for Android using Capacitor with deep-link OAuth callbacks, in-app contact importer, and biometric fingerprint lock configurable via app settings.</li>
+                    <li>Designed a PostgreSQL schema on Supabase with Row Level Security (RLS) policies and Supabase Auth (Google OAuth) to guarantee per-user data isolation and privacy.</li>
+                    <li>Built a dashboard with advanced search (name, phone, description, category), date-range and year/month filtering, and quick actions for call, WhatsApp, receive, give, and transfer.</li>
+                    <li>Integrated per-person PDF and Excel export using jsPDF, jspdf-autotable, and PapaParse, along with profile/business details, bank holidays, recycle bin, and developer support module.</li>
                 </ul>
             </div>
         </div>
 
         <div class="entry">
             <div class="entry-header">
-                <div class="entry-title">Scholar Nexus</div>
-                <div class="entry-meta">Next.js, TypeScript, Tailwind CSS, Prisma</div>
+                <div class="entry-title">Scholar Nexus — AI Research Discovery Platform</div>
+                <div class="entry-meta">Next.js, TypeScript, Prisma, z-ai SDK</div>
             </div>
             <div class="entry-desc">
                 <ul>
-                    <li>Architected an AI-powered, multi-source research paper discovery and synthesis platform that parallel queries nine major academic databases simultaneously.</li>
-                    <li>Developed an advanced deduplication algorithm that merges records by DOI and title similarity, ensuring the richest metadata is preserved across all sources.</li>
-                    <li>Implemented an intelligent ranking engine that scores papers across six dimensions including semantic relevance, citation impact, recency, and open-access availability.</li>
-                    <li>Integrated a cutting-edge AI evidence synthesis feature that analyzes multiple papers to identify consensus, contradictions, research gaps, and key findings.</li>
-                    <li>Built an interactive, D3.js force-directed citation network graph, allowing users to visually explore references and citing papers for any given publication.</li>
-                    <li>Embedded a PDF full-text Q&amp;A chatbot capable of answering complex user questions by directly analyzing the extracted text of the research papers.</li>
-                    <li>Engineered personalized features including color-coded reading collections, automated daily/weekly search alerts, author profiles, and persistent search history.</li>
+                    <li>Architected an AI-powered research paper discovery platform that simultaneously queries 9 academic databases (Semantic Scholar, arXiv, Crossref, PubMed, OpenAlex, and more) in parallel.</li>
+                    <li>Implemented a 10-step search pipeline: query understanding, AI-driven expansion, parallel fan-out, normalization, deduplication (DOI + title-hash + fuzzy), ranking, pagination, and AI insights.</li>
+                    <li>Developed composite ranking scoring papers across citation impact, recency, source authority, and open-access availability, with AI-generated per-paper insights (TL;DR, methodology, limitations).</li>
+                    <li>Built interactive D3.js citation network graphs, PDF full-text Q&amp;A chatbot, evidence synthesis across papers, color-coded reading collections, daily/weekly search alerts, and author profiles.</li>
+                    <li>Engineered 18 API route handlers with rate limiting (token bucket), SSRF protection, Zod input validation, and Prisma parameterized queries; deployed on Vercel with GitHub Actions CI.</li>
                 </ul>
             </div>
         </div>
 
         <div class="entry">
             <div class="entry-header">
-                <div class="entry-title">Air Pollution Tracker V2.0</div>
-                <div class="entry-meta">React, Tailwind CSS, Supabase, Mapbox</div>
+                <div class="entry-title">Air Pollution Tracker V2.0 — Environmental Intelligence</div>
+                <div class="entry-meta">React, Tailwind CSS, Supabase, React Leaflet</div>
             </div>
             <div class="entry-desc">
                 <ul>
-                    <li>Created a modern, data-driven React application that visualizes live and historical air-quality metrics for a catalog of over 200 cities worldwide.</li>
-                    <li>Implemented differentiated, role-based dashboards catering to both regular citizens (quick stats, advisories) and government officials (incident desks, heatmaps).</li>
-                    <li>Built interactive, high-density map views utilizing React Leaflet and Mapbox, featuring clustered markers and geolocation to seamlessly track air quality hotspots.</li>
-                    <li>Designed a robust data layer using React Query for stale-while-revalidate caching, optimistic updates, and background refreshing of OpenAQ API snapshots.</li>
-                    <li>Developed comprehensive Phase 5 analytics dashboards to deliver single-city deep dives, forecasting bands, health advisories, and source attribution analysis.</li>
-                    <li>Integrated Supabase for secure authentication, persistent offline-friendly user preferences, and an audit logging pipeline for monitoring government routing access.</li>
-                    <li>Optimized frontend performance with virtualized list rendering via react-window, ensuring smooth scrolling through hundreds of live environmental sensors.</li>
+                    <li>Created a data-driven React application visualizing live and historical air-quality metrics for 200+ cities worldwide, with OpenAQ v3 integration and EPA breakpoint AQI computation.</li>
+                    <li>Implemented differentiated role-based portals: citizen experience (dashboard, AQI tracking, map view) and government portal (heatmaps, incident desk, pollutant intelligence, reporting panels).</li>
+                    <li>Built interactive map views with React Leaflet clustered markers and geolocation (browser API with IP-based fallback via ipwho.is), plus Phase 5 analytics for single-city deep dives and forecasting.</li>
+                    <li>Designed a robust data layer using React Query v5 with stale-while-revalidate caching, 30-minute localStorage cache for OpenAQ snapshots, and virtualized list rendering via react-window.</li>
+                    <li>Integrated Supabase Auth with domain-guardrailed registration (citizen: @gmail/@outlook, government: @gov), email OTP verification, offline-friendly preferences, and audit logging for government access.</li>
                 </ul>
             </div>
         </div>
