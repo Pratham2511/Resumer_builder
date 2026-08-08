@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Pratham P Pansare - Resume</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         @page { size: A4; margin: 0; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -13,15 +13,15 @@
             background: #ffffff;
             font-family: 'Inter', 'Noto Sans SC', 'Liberation Sans', sans-serif;
             color: #2E2C2C;
-            line-height: 1.65;
-            font-size: 10pt;
+            line-height: 1.50;
+            font-size: 9.5pt;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
 
         .page {
             width: 210mm; height: 297mm;
-            padding: 55pt 60pt 60pt 60pt;
+            padding: 48pt 60pt 52pt 60pt;
             background: #ffffff;
             position: relative;
             overflow: hidden;
@@ -29,71 +29,92 @@
         }
         .page:last-child { page-break-after: auto; }
 
-        /* ── Header ── */
-        .header { text-align: center; margin-bottom: 12pt; }
+        /* ── Page Header (full — page 1) ── */
+        .header { text-align: center; margin-bottom: 10pt; }
         .header h1 {
-            font-size: 32pt; font-weight: 700;
-            letter-spacing: 2px; text-transform: uppercase;
-            color: #2E2C2C; line-height: 1.15; margin-bottom: 4pt;
-        }
-        .header-subtitle {
-            font-size: 14pt; font-weight: 600;
-            color: #2E2C2C; margin-bottom: 8pt;
+            font-size: 26pt; font-weight: 700;
+            letter-spacing: 2.5px; text-transform: uppercase;
+            color: #2E2C2C; line-height: 1.15; margin-bottom: 6pt;
         }
         .contact-row {
             display: flex; justify-content: space-between;
-            font-size: 10pt; color: #666464;
-            margin-top: 6pt;
+            font-size: 9.5pt; color: #666464;
+            margin-top: 4pt;
         }
-        .contact-item { display: inline-flex; align-items: center; gap: 5px; }
-        .contact-item svg { width: 12px; height: 12px; fill: #666464; flex-shrink: 0; }
+        .contact-item { display: inline-flex; align-items: center; gap: 4px; }
+        .contact-item svg { width: 11px; height: 11px; fill: #666464; flex-shrink: 0; }
+
+        /* ── Continuation Header (page 2+) ── */
+        .header-cont {
+            display: flex; justify-content: space-between; align-items: baseline;
+            margin-bottom: 8pt; padding-bottom: 4pt;
+            border-bottom: 0.75pt solid #2E2C2C;
+        }
+        .header-cont h2 {
+            font-size: 11pt; font-weight: 700;
+            letter-spacing: 1px; text-transform: uppercase;
+            color: #2E2C2C;
+        }
+        .header-cont .page-num {
+            font-size: 8.5pt; color: #666464; font-weight: 500;
+        }
 
         /* ── Section Divider ── */
         .section-divider {
             border: none;
             border-top: 0.75pt solid #2E2C2C;
-            margin: 10pt 0 0 0;
+            margin: 8pt 0 0 0;
         }
 
         /* ── Section ── */
         .section-title {
-            font-size: 14pt; font-weight: 700;
+            font-size: 12pt; font-weight: 700;
             text-transform: uppercase; letter-spacing: 1px;
-            color: #2E2C2C; margin-bottom: 8pt; margin-top: 2pt;
+            color: #2E2C2C; margin-bottom: 6pt; margin-top: 1pt;
         }
 
         /* ── About ── */
         .about-text {
-            font-size: 10pt; color: #2E2C2C;
-            text-align: justify; line-height: 1.65;
+            font-size: 9.5pt; color: #2E2C2C;
+            text-align: justify; line-height: 1.50;
         }
 
         /* ── Entry ── */
-        .entry { margin-bottom: 10pt; }
+        .entry { margin-bottom: 8pt; }
         .entry-meta-line {
-            font-size: 10pt; color: #666464; font-weight: 600;
+            font-size: 9.5pt; color: #666464; font-weight: 600;
             margin-bottom: 1pt;
         }
         .entry-title {
-            font-size: 11pt; font-weight: 700; color: #2E2C2C;
-            margin-bottom: 3pt;
+            font-size: 10.5pt; font-weight: 700; color: #2E2C2C;
+            margin-bottom: 2pt;
         }
         .entry-desc {
-            font-size: 10pt; color: #2E2C2C; line-height: 1.65;
+            font-size: 9.5pt; color: #2E2C2C; line-height: 1.50;
         }
-        .entry-desc ul { padding-left: 16px; }
+        .entry-desc ul { padding-left: 15px; }
         .entry-desc li {
-            margin-bottom: 1pt; text-align: justify;
+            margin-bottom: 0.5pt; text-align: justify;
         }
 
         /* ── Skills 3-column ── */
         .skills-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 4pt 20pt;
-            font-size: 10pt; color: #2E2C2C;
+            gap: 3pt 18pt;
+            font-size: 9.5pt; color: #2E2C2C;
         }
         .skills-col strong { color: #2E2C2C; }
+
+        /* ── Footer ── */
+        .page-footer {
+            position: absolute;
+            bottom: 22pt; left: 60pt; right: 60pt;
+            display: flex; justify-content: space-between;
+            font-size: 7pt; color: #aaa;
+            border-top: 0.4pt solid #ddd;
+            padding-top: 3pt;
+        }
 
         /* ── Screen preview ── */
         @media screen {
@@ -170,10 +191,20 @@
             </ul>
         </div>
     </div>
+
+    <div class="page-footer">
+        <span>Pratham P Pansare</span>
+        <span>Page 1 of 2</span>
+    </div>
 </div>
 
 <!-- ═══════ PAGE 2 ═══════ -->
 <div class="page" id="page-2">
+
+    <div class="header-cont">
+        <h2>Pratham P Pansare</h2>
+        <span class="page-num">Page 2 of 2</span>
+    </div>
 
     <div class="entry">
         <div class="entry-meta-line">React, Supabase, Capacitor, Bootstrap, jsPDF</div>
@@ -217,6 +248,10 @@
         </div>
     </div>
 
+    <div class="page-footer">
+        <span>Pratham P Pansare</span>
+        <span>Page 2 of 2</span>
+    </div>
 </div>
 
 </body>
