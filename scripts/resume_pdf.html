@@ -6,7 +6,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         @page { size: A4; margin: 0; }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         html, body {
@@ -14,15 +13,15 @@
             background: #ffffff;
             font-family: 'Inter', 'Noto Sans SC', 'Liberation Sans', sans-serif;
             color: #2E2C2C;
-            line-height: 1.55;
+            line-height: 1.65;
+            font-size: 10pt;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
 
         .page {
-            width: 210mm;
-            height: 297mm;
-            padding: 19mm 21mm 20mm 21mm;
+            width: 210mm; height: 297mm;
+            padding: 55pt 60pt 60pt 60pt;
             background: #ffffff;
             position: relative;
             overflow: hidden;
@@ -30,121 +29,75 @@
         }
         .page:last-child { page-break-after: auto; }
 
-        /* Header */
-        .header { margin-bottom: 6px; }
+        /* ── Header ── */
+        .header { text-align: center; margin-bottom: 12pt; }
         .header h1 {
-            font-size: 28pt;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #2E2C2C;
-            line-height: 1.15;
-            margin-bottom: 6px;
+            font-size: 32pt; font-weight: 700;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: #2E2C2C; line-height: 1.15; margin-bottom: 4pt;
+        }
+        .header-subtitle {
+            font-size: 14pt; font-weight: 600;
+            color: #2E2C2C; margin-bottom: 8pt;
         }
         .contact-row {
-            display: flex;
-            gap: 16px;
-            font-size: 9pt;
-            color: #666464;
-            flex-wrap: wrap;
-            line-height: 1.5;
+            display: flex; justify-content: space-between;
+            font-size: 10pt; color: #666464;
+            margin-top: 6pt;
         }
-        .contact-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .contact-item svg {
-            width: 11px; height: 11px;
-            fill: #666464;
-            flex-shrink: 0;
+        .contact-item { display: inline-flex; align-items: center; gap: 5px; }
+        .contact-item svg { width: 12px; height: 12px; fill: #666464; flex-shrink: 0; }
+
+        /* ── Section Divider ── */
+        .section-divider {
+            border: none;
+            border-top: 0.75pt solid #2E2C2C;
+            margin: 10pt 0 0 0;
         }
 
-        /* Section */
-        .section { margin-bottom: 0; }
+        /* ── Section ── */
         .section-title {
-            font-size: 12pt;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            color: #2E2C2C;
-            margin-bottom: 0;
-            padding-bottom: 3px;
-            border-bottom: 0.75pt solid #2E2C2C;
-            margin-top: 10px;
+            font-size: 14pt; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: #2E2C2C; margin-bottom: 8pt; margin-top: 2pt;
         }
 
-        /* About */
+        /* ── About ── */
         .about-text {
-            font-size: 9.5pt;
-            color: #2E2C2C;
-            text-align: justify;
-            line-height: 1.55;
-            margin-top: 6px;
+            font-size: 10pt; color: #2E2C2C;
+            text-align: justify; line-height: 1.65;
         }
 
-        /* Entry */
-        .entry { margin-top: 6px; }
-        .entry-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            gap: 6px;
+        /* ── Entry ── */
+        .entry { margin-bottom: 10pt; }
+        .entry-meta-line {
+            font-size: 10pt; color: #666464; font-weight: 600;
+            margin-bottom: 1pt;
         }
         .entry-title {
-            font-size: 10pt;
-            font-weight: 700;
-            color: #2E2C2C;
-        }
-        .entry-subtitle {
-            font-size: 9pt;
-            font-weight: 400;
-            color: #666464;
-            margin-top: 1px;
-        }
-        .entry-meta {
-            font-size: 9pt;
-            color: #666464;
-            font-weight: 400;
-            white-space: nowrap;
-            flex-shrink: 0;
+            font-size: 11pt; font-weight: 700; color: #2E2C2C;
+            margin-bottom: 3pt;
         }
         .entry-desc {
-            font-size: 9.5pt;
-            color: #2E2C2C;
-            margin-top: 2px;
+            font-size: 10pt; color: #2E2C2C; line-height: 1.65;
         }
-        .entry-desc ul {
-            padding-left: 14px;
-        }
+        .entry-desc ul { padding-left: 16px; }
         .entry-desc li {
-            margin-bottom: 1px;
-            text-align: justify;
-            line-height: 1.45;
+            margin-bottom: 1pt; text-align: justify;
         }
 
-        /* Skills */
-        .skills-list {
-            font-size: 9.5pt;
-            color: #2E2C2C;
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-            margin-top: 6px;
+        /* ── Skills 3-column ── */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 4pt 20pt;
+            font-size: 10pt; color: #2E2C2C;
         }
-        .skills-category strong {
-            color: #2E2C2C;
-            margin-right: 3px;
-        }
+        .skills-col strong { color: #2E2C2C; }
 
+        /* ── Screen preview ── */
         @media screen {
-            body {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                padding: 2rem; gap: 2rem;
-                background: #e0e0e0;
-            }
+            body { display: flex; flex-direction: column; align-items: center; padding: 2rem; gap: 2rem; background: #e0e0e0; }
             .page { box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         }
     </style>
@@ -167,120 +120,103 @@
             </span>
             <span class="contact-item">
                 <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                203 Yashshree Coh, Vishnunagar, Dombivli West 421202
+                Dombivli West, Maharashtra 421202
             </span>
         </div>
     </div>
 
-    <div class="section">
-        <h3 class="section-title">About Me</h3>
-        <p class="about-text">Aspiring software developer with hands-on experience building scalable, full-stack applications and AI-driven platforms. Proficient in modern web frameworks, relational databases, and machine learning integration, with a strong ability to translate complex technical requirements into user-centric solutions. Passionate about software architecture, clean code, and continuous learning.</p>
+    <hr class="section-divider">
+    <div class="section-title">About Me</div>
+    <p class="about-text">Aspiring software developer with hands-on experience building scalable, full-stack applications and AI-driven platforms. Proficient in modern web frameworks, relational databases, and machine learning integration, with a strong ability to translate complex technical requirements into user-centric solutions. Passionate about software architecture, clean code, and continuous learning.</p>
+
+    <hr class="section-divider">
+    <div class="section-title">Education</div>
+    <div class="entry">
+        <div class="entry-meta-line">A. P. Shah Institute of Technology, Thane</div>
+        <div class="entry-title">B.Tech in Information Technology</div>
+    </div>
+    <div class="entry">
+        <div class="entry-meta-line">Jana Gana Mana College, Dombivli</div>
+        <div class="entry-title">Higher Secondary Education (11th - 12th)</div>
+    </div>
+    <div class="entry">
+        <div class="entry-meta-line">Model English School, Dombivli West</div>
+        <div class="entry-title">Secondary Education (1st - 10th)</div>
     </div>
 
-    <div class="section">
-        <h3 class="section-title">Education</h3>
-        <div class="entry">
-            <div class="entry-header">
-                <div class="entry-title">A. P. Shah Institute of Technology (Engineering), Thane</div>
-            </div>
-            <div class="entry-subtitle">B.Tech in Information Technology</div>
-        </div>
-        <div class="entry">
-            <div class="entry-header">
-                <div class="entry-title">Jana Gana Mana College, Dombivli</div>
-            </div>
-            <div class="entry-subtitle">Higher Secondary Education (11th - 12th)</div>
-        </div>
-        <div class="entry">
-            <div class="entry-header">
-                <div class="entry-title">Model English School, Dombivli West</div>
-            </div>
-            <div class="entry-subtitle">Secondary Education (1st - 10th)</div>
-        </div>
+    <hr class="section-divider">
+    <div class="section-title">Skills</div>
+    <div class="skills-grid">
+        <div class="skills-col"><strong>Languages</strong><br>Python, JavaScript,<br>TypeScript, SQL, CSS, HTML</div>
+        <div class="skills-col"><strong>Frameworks</strong><br>React, Next.js, FastAPI,<br>Flask, Tailwind CSS, Bootstrap</div>
+        <div class="skills-col"><strong>Databases</strong><br>PostgreSQL, MySQL, SQLite,<br>Supabase, Redis, Prisma</div>
+        <div class="skills-col"><strong>ML / AI</strong><br>TensorFlow, D3.js,<br>z-ai SDK, Google Colab</div>
+        <div class="skills-col"><strong>Cloud / DevOps</strong><br>AWS, Cloudflare R2,<br>GitHub Actions, Vercel, HF Spaces</div>
+        <div class="skills-col"><strong>Tools</strong><br>Capacitor, Figma, Canva,<br>GitHub, ZXing, jsPDF</div>
     </div>
 
-    <div class="section">
-        <h3 class="section-title">Skills</h3>
-        <div class="skills-list">
-            <div class="skills-category"><strong>Languages:</strong> Python, JavaScript, TypeScript, CSS, HTML, SQL</div>
-            <div class="skills-category"><strong>Libraries/Frameworks:</strong> React, Next.js, FastAPI, Flask, Tailwind CSS, Bootstrap, Prisma</div>
-            <div class="skills-category"><strong>Databases:</strong> MySQL, PostgreSQL, SQLite, Supabase, Redis</div>
-            <div class="skills-category"><strong>Cloud &amp; DevOps:</strong> AWS, Cloudflare R2, GitHub Actions, Vercel, Hugging Face Spaces</div>
-            <div class="skills-category"><strong>Tools:</strong> TensorFlow, D3.js, Figma, Canva, Google Colab, GitHub, Capacitor</div>
-        </div>
-    </div>
-
-    <div class="section">
-        <h3 class="section-title">Projects</h3>
-        <div class="entry">
-            <div class="entry-header">
-                <div class="entry-title">ShetVaidya — AI Crop Disease Analyzer &amp; Medicine Verifier</div>
-                <div class="entry-meta">React, FastAPI, TensorFlow, PostgreSQL</div>
-            </div>
-            <div class="entry-desc">
-                <ul>
-                    <li>Built a production-grade, location-aware crop disease analyzer and medicine verification platform (ShetVaidya = "field doctor" in Marathi) to empower farmers with immediate diagnostic tools.</li>
-                    <li>Developed a TensorFlow MobileNetV2 inference microservice with V2.0 prediction safety — dedicated non-leaf/garbage class rejection and confidence gating for out-of-scope images.</li>
-                    <li>Engineered a microservice architecture (frontend, backend, ML service) with FastAPI, JWT HttpOnly cookies, Google OAuth, and API rate limiting on auth and batch verification flows.</li>
-                    <li>Configured Cloudflare R2 object storage for secure image uploads (5MB limit, MIME validation) and integrated ZXing barcode scanning for medicine batch verification with non-public batch codes.</li>
-                    <li>Established CI/CD via GitHub Actions for containerized deployment across Vercel (frontend) and Hugging Face Spaces (backend + ML), with PostgreSQL and Redis for structured data and caching.</li>
-                </ul>
-            </div>
+    <hr class="section-divider">
+    <div class="section-title">Projects</div>
+    <div class="entry">
+        <div class="entry-meta-line">React, FastAPI, TensorFlow, PostgreSQL, Redis, Cloudflare R2</div>
+        <div class="entry-title">ShetVaidya — AI Crop Disease Analyzer &amp; Medicine Verifier</div>
+        <div class="entry-desc">
+            <ul>
+                <li>Built a production-grade, location-aware crop disease analyzer and medicine verification platform (ShetVaidya = "field doctor" in Marathi) to empower farmers with immediate diagnostic tools.</li>
+                <li>Developed a TensorFlow MobileNetV2 inference microservice with V2.0 prediction safety — dedicated non-leaf/garbage class rejection and confidence gating for out-of-scope images.</li>
+                <li>Engineered a microservice architecture (frontend, backend, ML service) with FastAPI, JWT HttpOnly cookies, Google OAuth, and API rate limiting on auth and batch verification flows.</li>
+                <li>Configured Cloudflare R2 object storage for secure image uploads (5MB limit, MIME validation) and integrated ZXing barcode scanning for medicine batch verification with non-public batch codes.</li>
+                <li>Established CI/CD via GitHub Actions for containerized deployment across Vercel (frontend) and Hugging Face Spaces (backend + ML), with PostgreSQL and Redis for data and caching.</li>
+            </ul>
         </div>
     </div>
 </div>
 
 <!-- ═══════ PAGE 2 ═══════ -->
 <div class="page" id="page-2">
-    <div class="section">
-        <div class="entry">
-            <div class="entry-header">
-                <div class="entry-title">Khatawali Records — Credit/Debit Ledger App</div>
-                <div class="entry-meta">React, Supabase, Capacitor, Bootstrap</div>
-            </div>
-            <div class="entry-desc">
-                <ul>
-                    <li>Engineered a mobile-first credit/debit ledger application for small business owners and individuals, with category-separated tracking for the same person across independent ledgers.</li>
-                    <li>Packaged natively for Android using Capacitor with deep-link OAuth callbacks, in-app contact importer, and biometric fingerprint lock configurable via app settings.</li>
-                    <li>Designed a PostgreSQL schema on Supabase with Row Level Security (RLS) policies and Supabase Auth (Google OAuth) to guarantee per-user data isolation and privacy.</li>
-                    <li>Built a dashboard with advanced search (name, phone, description, category), date-range and year/month filtering, and quick actions for call, WhatsApp, receive, give, and transfer.</li>
-                    <li>Integrated per-person PDF and Excel export using jsPDF, jspdf-autotable, and PapaParse, along with profile/business details, bank holidays, recycle bin, and developer support module.</li>
-                </ul>
-            </div>
-        </div>
 
-        <div class="entry">
-            <div class="entry-header">
-                <div class="entry-title">Scholar Nexus — AI Research Discovery Platform</div>
-                <div class="entry-meta">Next.js, TypeScript, Prisma, z-ai SDK</div>
-            </div>
-            <div class="entry-desc">
-                <ul>
-                    <li>Architected an AI-powered research paper discovery platform that simultaneously queries 9 academic databases (Semantic Scholar, arXiv, Crossref, PubMed, OpenAlex, and more) in parallel.</li>
-                    <li>Implemented a 10-step search pipeline: query understanding, AI-driven expansion, parallel fan-out, normalization, deduplication (DOI + title-hash + fuzzy), ranking, pagination, and AI insights.</li>
-                    <li>Developed composite ranking scoring papers across citation impact, recency, source authority, and open-access availability, with AI-generated per-paper insights (TL;DR, methodology, limitations).</li>
-                    <li>Built interactive D3.js citation network graphs, PDF full-text Q&amp;A chatbot, evidence synthesis across papers, color-coded reading collections, daily/weekly search alerts, and author profiles.</li>
-                    <li>Engineered 18 API route handlers with rate limiting (token bucket), SSRF protection, Zod input validation, and Prisma parameterized queries; deployed on Vercel with GitHub Actions CI.</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="entry">
-            <div class="entry-header">
-                <div class="entry-title">Air Pollution Tracker V2.0 — Environmental Intelligence</div>
-                <div class="entry-meta">React, Tailwind CSS, Supabase, React Leaflet</div>
-            </div>
-            <div class="entry-desc">
-                <ul>
-                    <li>Created a data-driven React application visualizing live and historical air-quality metrics for 200+ cities worldwide, with OpenAQ v3 integration and EPA breakpoint AQI computation.</li>
-                    <li>Implemented differentiated role-based portals: citizen experience (dashboard, AQI tracking, map view) and government portal (heatmaps, incident desk, pollutant intelligence, reporting panels).</li>
-                    <li>Built interactive map views with React Leaflet clustered markers and geolocation (browser API with IP-based fallback via ipwho.is), plus Phase 5 analytics for single-city deep dives and forecasting.</li>
-                    <li>Designed a robust data layer using React Query v5 with stale-while-revalidate caching, 30-minute localStorage cache for OpenAQ snapshots, and virtualized list rendering via react-window.</li>
-                    <li>Integrated Supabase Auth with domain-guardrailed registration (citizen: @gmail/@outlook, government: @gov), email OTP verification, offline-friendly preferences, and audit logging for government access.</li>
-                </ul>
-            </div>
+    <div class="entry">
+        <div class="entry-meta-line">React, Supabase, Capacitor, Bootstrap, jsPDF</div>
+        <div class="entry-title">Khatawali Records — Credit/Debit Ledger App</div>
+        <div class="entry-desc">
+            <ul>
+                <li>Engineered a mobile-first credit/debit ledger application for small business owners and individuals, with category-separated tracking for the same person across independent ledgers.</li>
+                <li>Packaged natively for Android using Capacitor with deep-link OAuth callbacks, in-app contact importer, and biometric fingerprint lock configurable via app settings.</li>
+                <li>Designed a PostgreSQL schema on Supabase with Row Level Security (RLS) policies and Supabase Auth (Google OAuth) to guarantee per-user data isolation and privacy.</li>
+                <li>Built a dashboard with advanced search (name, phone, description, category), date-range and year/month filtering, and quick actions for call, WhatsApp, receive, give, and transfer.</li>
+                <li>Integrated per-person PDF and Excel export using jsPDF, jspdf-autotable, and PapaParse, along with profile/business details, bank holidays, recycle bin, and developer support module.</li>
+            </ul>
         </div>
     </div>
+
+    <div class="entry">
+        <div class="entry-meta-line">Next.js, TypeScript, Prisma, z-ai SDK, D3.js</div>
+        <div class="entry-title">Scholar Nexus — AI Research Discovery Platform</div>
+        <div class="entry-desc">
+            <ul>
+                <li>Architected an AI-powered research paper discovery platform that simultaneously queries 9 academic databases (Semantic Scholar, arXiv, Crossref, PubMed, OpenAlex, and more) in parallel.</li>
+                <li>Implemented a 10-step search pipeline: query understanding, AI-driven expansion, parallel fan-out, normalization, deduplication (DOI + title-hash + fuzzy), ranking, and AI insights.</li>
+                <li>Developed composite ranking scoring papers across citation impact, recency, source authority, and open-access availability, with AI-generated per-paper insights (TL;DR, methodology, limitations).</li>
+                <li>Built interactive D3.js citation network graphs, PDF full-text Q&amp;A chatbot, evidence synthesis across papers, color-coded reading collections, daily/weekly search alerts, and author profiles.</li>
+                <li>Engineered 18 API route handlers with rate limiting (token bucket), SSRF protection, Zod input validation, and Prisma parameterized queries; deployed on Vercel with GitHub Actions CI.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="entry">
+        <div class="entry-meta-line">React, Tailwind CSS, Supabase, React Leaflet, Recharts</div>
+        <div class="entry-title">Air Pollution Tracker V2.0 — Environmental Intelligence</div>
+        <div class="entry-desc">
+            <ul>
+                <li>Created a data-driven React application visualizing live and historical air-quality metrics for 200+ cities worldwide, with OpenAQ v3 integration and EPA breakpoint AQI computation.</li>
+                <li>Implemented differentiated role-based portals: citizen experience (dashboard, AQI tracking, map view) and government portal (heatmaps, incident desk, pollutant intelligence, reporting panels).</li>
+                <li>Built interactive map views with React Leaflet clustered markers and geolocation (browser API with IP-based fallback via ipwho.is), plus Phase 5 analytics for single-city deep dives and forecasting.</li>
+                <li>Designed a robust data layer using React Query v5 with stale-while-revalidate caching, 30-minute localStorage cache for OpenAQ snapshots, and virtualized list rendering via react-window.</li>
+                <li>Integrated Supabase Auth with domain-guardrailed registration (citizen: @gmail/@outlook, government: @gov), email OTP verification, offline-friendly preferences, and audit logging for government access.</li>
+            </ul>
+        </div>
+    </div>
+
 </div>
 
 </body>
