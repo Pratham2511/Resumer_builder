@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pratham P Pansare - Resume</title>
+    <!-- Google Fonts for typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e0e0e0;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        /* Explicit A4 Page Containers */
+        .page {
+            background-color: #ffffff;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm; /* Consistent margins for A4 */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            page-break-after: always;
+        }
+
+        /* Hide the page break after the last page */
+        .page:last-child {
+            page-break-after: auto;
+        }
+
+        /* Header Section */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .header-content {
+            text-align: center;
+        }
+
+        .header-content h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #222;
+            margin-bottom: 12px;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: 0.95rem;
+            color: #444;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .contact-item svg {
+            width: 16px;
+            height: 16px;
+            fill: #333;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 20px;
+        }
+
+        /* For the continued projects section on Page 2 */
+        .section.continued {
+            margin-top: 0;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #222;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #222;
+            padding-bottom: 5px;
+        }
+
+        /* About Me */
+        .about-text {
+            font-size: 0.95rem;
+            color: #444;
+            text-align: justify;
+        }
+
+        /* Education & Projects */
+        .entry {
+            margin-bottom: 18px;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 4px;
+        }
+
+        .entry-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #222;
+        }
+
+        .entry-subtitle {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 5px;
+        }
+
+        .entry-meta {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .entry-desc {
+            font-size: 0.95rem;
+            color: #444;
+        }
+        
+        .entry-desc ul {
+            padding-left: 20px;
+            margin-top: 5px;
+        }
+
+        .entry-desc li {
+            margin-bottom: 6px;
+            text-align: justify;
+        }
+
+        /* Skills */
+        .skills-list {
+            font-size: 0.95rem;
+            color: #444;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .skills-category strong {
+            color: #222;
+            margin-right: 5px;
+        }
+
+        /* Print styling */
+        @media print {
+            /* Tell the browser to use A4 layout and remove default margins */
+            @page {
+                size: A4;
+                margin: 0;
+            }
+            body {
+                background-color: #fff;
+                padding: 0;
+                margin: 0;
+                gap: 0;
+            }
+            .page {
+                box-shadow: none;
+                /* Keep the padding to act as the printed margin */
+                padding: 20mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1 -->
+    <div class="page" id="page-1">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>Pratham P Pansare</h1>
+                <div class="contact-info">
+                    <span class="contact-item">
+                        <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                        +91 8268786121
+                    </span>
+                    <span class="contact-item">
+                        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        prathampansare9@gmail.com
+                    </span>
+                    <span class="contact-item">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        203 Yashshree Coh, Vishnunagar, Dombivli West 421202
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Me -->
+        <div class="section">
+            <h3 class="section-title">About Me</h3>
+            <p class="about-text">
+                Dedicated Software Developer with hands-on experience in building scalable, full-stack applications and AI-driven platforms. Proficient in modern web frameworks and relational databases, with a strong ability to translate complex technical requirements into user-centric solutions. Passionate about software architecture, clean code, and continuous learning.
+            </p>
+        </div>
+
+        <!-- Education -->
+        <div class="section">
+            <h3 class="section-title">Education</h3>
+            
+            <div class="entry">
+                <div class="entry-header">
+                    <div class="entry-title">A. P. Shah Institute of Technology (Engineering), Thane</div>
+                </div>
+                <div class="entry-subtitle">B.Tech in Information Technology</div>
+            </div>
+
+            <div class="entry">
+                <div class="entry-header">
+                    <div class="entry-title">Jana Gana Mana College, Dombivli</div>
+                </div>
+                <div class="entry-subtitle">Higher Secondary Education (11th - 12th)</div>
+            </div>
+
+            <div class="entry">
+                <div class="entry-header">
+                    <div class="entry-title">Model English School, Dombivli West</div>
+                </div>
+                <div class="entry-subtitle">Secondary Education (1st - 10th)</div>
+            </div>
+        </div>
+
+        <!-- Skills -->
+        <div class="section">
+            <h3 class="section-title">Skills</h3>
+            <div class="skills-list">
+                <div class="skills-category">
+                    <strong>Languages:</strong> Python, JavaScript, CSS, HTML, SQL
+                </div>
+                <div class="skills-category">
+                    <strong>Libraries/Frameworks:</strong> React, Next.js, Flask, Tailwind CSS, Bootstrap
+                </div>
+                <div class="skills-category">
+                    <strong>Databases:</strong> MySQL, PostgreSQL, SQLite, Supabase
+                </div>
+                <div class="skills-category">
+                    <strong>Cloud & DevOps:</strong> AWS, GitHub Actions, Vercel
+                </div>
+                <div class="skills-category">
+                    <strong>Tools:</strong> Figma, Canva, Google Colab, GitHub
+                </div>
+            </div>
+        </div>
+
+        <!-- Projects (Starts here, continues to page 2) -->
+        <div class="section">
+            <h3 class="section-title">Projects</h3>
+            
+            <!-- Project 1 -->
+            <div class="entry">
+                <div class="entry-header">
+                    <div class="entry-title">ShetVaidya (Plant Disease Analyzer)</div>
+                    <div class="entry-meta">React, FastAPI, PostgreSQL, TensorFlow</div>
+                </div>
+                <div class="entry-desc">
+                    <ul>
+                        <li>Built a production-grade, location-aware AI crop disease analyzer and medicine verification platform aimed at empowering farmers with immediate diagnostic tools.</li>
+                        <li>Developed an accurate machine learning inference microservice utilizing a TensorFlow MobileNetV2 model to analyze uploaded plant images and identify specific diseases.</li>
+                        <li>Engineered a robust and scalable backend using FastAPI, integrating JWT-based HttpOnly cookies for secure authentication and Google OAuth for user login.</li>
+                        <li>Configured Cloudflare R2 object storage to securely handle and validate image uploads, enforcing strict 5MB size limits and MIME type verifications.</li>
+                        <li>Built a responsive frontend application with React and Vite, featuring protected routes and a ZXing barcode scanner for medicine batch verification.</li>
+                        <li>Established a complete CI/CD pipeline using GitHub Actions to automate static checks, builds, and containerized deployment across Vercel and Hugging Face Spaces.</li>
+                        <li>Integrated PostgreSQL for structured relational data and Redis for caching, ensuring high-performance data retrieval and session management.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div> <!-- END OF PAGE 1 -->
+
+
+    <!-- PAGE 2 -->
+    <div class="page" id="page-2">
+        <div class="section continued">
+            <!-- Optional Header for Continued Section (commented out by default) -->
+            <!-- <h3 class="section-title" style="border:none; font-size: 1rem; color: #666;">Projects (Continued)</h3> -->
+
+            <!-- Project 2 -->
+            <div class="entry">
+                <div class="entry-header">
+                    <div class="entry-title">Khatawali Records</div>
+                    <div class="entry-meta">React, Supabase, Bootstrap</div>
+                </div>
+                <div class="entry-desc">
+                    <ul>
+                        <li>Engineered a mobile-first, comprehensive credit and debit ledger application designed for small business owners and individuals to manage financial transactions.</li>
+                        <li>Packaged the application natively for Android using Capacitor, enabling seamless mobile features like an in-app contact importer and deep linking capabilities.</li>
+                        <li>Designed a scalable PostgreSQL database schema on Supabase, leveraging Row Level Security (RLS) policies and Supabase Auth to guarantee user data privacy.</li>
+                        <li>Implemented robust category-wise separation, allowing users to track the same person across multiple independent ledger categories seamlessly.</li>
+                        <li>Developed an advanced filtering and search dashboard supporting date-range queries, year/month summaries, and instant person-lookup by name or phone number.</li>
+                        <li>Integrated high-value export functionalities utilizing jsPDF and PapaParse, allowing users to download per-person transaction histories as PDFs or Excel files.</li>
+                        <li>Enhanced application security and user experience by implementing biometric fingerprint locking mechanisms configurable directly within the app settings.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Project 3 -->
+            <div class="entry">
+                <div class="entry-header">
+                    <div class="entry-title">Scholar Nexus</div>
+                    <div class="entry-meta">Next.js, TypeScript, Tailwind CSS, Prisma</div>
+                </div>
+                <div class="entry-desc">
+                    <ul>
+                        <li>Architected an AI-powered, multi-source research paper discovery and synthesis platform that parallel queries nine major academic databases simultaneously.</li>
+                        <li>Developed an advanced deduplication algorithm that merges records by DOI and title similarity, ensuring the richest metadata is preserved across all sources.</li>
+                        <li>Implemented an intelligent ranking engine that scores papers across six dimensions including semantic relevance, citation impact, recency, and open-access availability.</li>
+                        <li>Integrated a cutting-edge AI evidence synthesis feature that analyzes multiple papers to identify consensus, contradictions, research gaps, and key findings.</li>
+                        <li>Built an interactive, D3.js force-directed citation network graph, allowing users to visually explore references and citing papers for any given publication.</li>
+                        <li>Embedded a PDF full-text Q&A chatbot capable of answering complex user questions by directly analyzing the extracted text of the research papers.</li>
+                        <li>Engineered personalized features including color-coded reading collections, automated daily/weekly search alerts, author profiles, and persistent search history.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Project 4 -->
+            <div class="entry">
+                <div class="entry-header">
+                    <div class="entry-title">Air Pollution Tracker V2.0</div>
+                    <div class="entry-meta">React, Tailwind CSS, Supabase, Mapbox</div>
+                </div>
+                <div class="entry-desc">
+                    <ul>
+                        <li>Created a modern, data-driven React application that visualizes live and historical air-quality metrics for a catalog of over 200 cities worldwide.</li>
+                        <li>Implemented differentiated, role-based dashboards catering to both regular citizens (quick stats, advisories) and government officials (incident desks, heatmaps).</li>
+                        <li>Built interactive, high-density map views utilizing React Leaflet and Mapbox, featuring clustered markers and geolocation to seamlessly track air quality hotspots.</li>
+                        <li>Designed a robust data layer using React Query for stale-while-revalidate caching, optimistic updates, and background refreshing of OpenAQ API snapshots.</li>
+                        <li>Developed comprehensive Phase 5 analytics dashboards to deliver single-city deep dives, forecasting bands, health advisories, and source attribution analysis.</li>
+                        <li>Integrated Supabase for secure authentication, persistent offline-friendly user preferences, and an audit logging pipeline for monitoring government routing access.</li>
+                        <li>Optimized frontend performance with virtualized list rendering via react-window, ensuring smooth scrolling through hundreds of live environmental sensors.</li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+    </div> <!-- END OF PAGE 2 -->
+
+</body>
+</html>

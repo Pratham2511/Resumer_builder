@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pratham P Pansare - Resume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+            font-family: 'Inter', 'Noto Sans SC', 'Liberation Sans', sans-serif;
+            color: #333;
+            line-height: 1.5;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            padding: 14mm 18mm;
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+        }
+        .page:last-child { page-break-after: auto; }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #222;
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            line-height: 1.2;
+        }
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            font-size: 0.72rem;
+            color: #555;
+            flex-wrap: wrap;
+            line-height: 1.4;
+        }
+        .contact-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .contact-item svg {
+            width: 12px;
+            height: 12px;
+            fill: #444;
+            flex-shrink: 0;
+        }
+
+        /* Sections */
+        .section { margin-bottom: 8px; }
+        .section.continued { margin-top: 0; }
+        .section-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #1a1a1a;
+            margin-bottom: 5px;
+            border-bottom: 1.2px solid #1a1a1a;
+            padding-bottom: 2px;
+        }
+
+        /* About Me */
+        .about-text {
+            font-size: 0.76rem;
+            color: #444;
+            text-align: justify;
+            line-height: 1.45;
+        }
+
+        /* Entries */
+        .entry { margin-bottom: 6px; }
+        .entry:last-child { margin-bottom: 0; }
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 1px;
+            gap: 6px;
+        }
+        .entry-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .entry-subtitle {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 1px;
+        }
+        .entry-meta {
+            font-size: 0.68rem;
+            color: #666;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .entry-desc {
+            font-size: 0.72rem;
+            color: #444;
+        }
+        .entry-desc ul {
+            padding-left: 14px;
+            margin-top: 2px;
+        }
+        .entry-desc li {
+            margin-bottom: 2px;
+            text-align: justify;
+            line-height: 1.38;
+        }
+
+        /* Skills */
+        .skills-list {
+            font-size: 0.72rem;
+            color: #444;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .skills-category strong {
+            color: #1a1a1a;
+            margin-right: 3px;
+        }
+
+        @media screen {
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 2rem;
+                gap: 2rem;
+                background: #e0e0e0;
+            }
+            .page { box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════ PAGE 1 ═══════ -->
+<div class="page" id="page-1">
+    <div class="header">
+        <h1>Pratham P Pansare</h1>
+        <div class="contact-info">
+            <span class="contact-item">
+                <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                +91 8268786121
+            </span>
+            <span class="contact-item">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                prathampansare9@gmail.com
+            </span>
+            <span class="contact-item">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                203 Yashshree Coh, Vishnunagar, Dombivli West 421202
+            </span>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">About Me</h3>
+        <p class="about-text">Dedicated Software Developer with hands-on experience in building scalable, full-stack applications and AI-driven platforms. Proficient in modern web frameworks and relational databases, with a strong ability to translate complex technical requirements into user-centric solutions. Passionate about software architecture, clean code, and continuous learning.</p>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">Education</h3>
+        <div class="entry">
+            <div class="entry-header"><div class="entry-title">A. P. Shah Institute of Technology (Engineering), Thane</div></div>
+            <div class="entry-subtitle">B.Tech in Information Technology</div>
+        </div>
+        <div class="entry">
+            <div class="entry-header"><div class="entry-title">Jana Gana Mana College, Dombivli</div></div>
+            <div class="entry-subtitle">Higher Secondary Education (11th - 12th)</div>
+        </div>
+        <div class="entry">
+            <div class="entry-header"><div class="entry-title">Model English School, Dombivli West</div></div>
+            <div class="entry-subtitle">Secondary Education (1st - 10th)</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">Skills</h3>
+        <div class="skills-list">
+            <div class="skills-category"><strong>Languages:</strong> Python, JavaScript, CSS, HTML, SQL</div>
+            <div class="skills-category"><strong>Libraries/Frameworks:</strong> React, Next.js, Flask, Tailwind CSS, Bootstrap</div>
+            <div class="skills-category"><strong>Databases:</strong> MySQL, PostgreSQL, SQLite, Supabase</div>
+            <div class="skills-category"><strong>Cloud &amp; DevOps:</strong> AWS, GitHub Actions, Vercel</div>
+            <div class="skills-category"><strong>Tools:</strong> Figma, Canva, Google Colab, GitHub</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">Projects</h3>
+        <div class="entry">
+            <div class="entry-header">
+                <div class="entry-title">ShetVaidya (Plant Disease Analyzer)</div>
+                <div class="entry-meta">React, FastAPI, PostgreSQL, TensorFlow</div>
+            </div>
+            <div class="entry-desc">
+                <ul>
+                    <li>Built a production-grade, location-aware AI crop disease analyzer and medicine verification platform aimed at empowering farmers with immediate diagnostic tools.</li>
+                    <li>Developed an accurate machine learning inference microservice utilizing a TensorFlow MobileNetV2 model to analyze uploaded plant images and identify specific diseases.</li>
+                    <li>Engineered a robust and scalable backend using FastAPI, integrating JWT-based HttpOnly cookies for secure authentication and Google OAuth for user login.</li>
+                    <li>Configured Cloudflare R2 object storage to securely handle and validate image uploads, enforcing strict 5MB size limits and MIME type verifications.</li>
+                    <li>Built a responsive frontend application with React and Vite, featuring protected routes and a ZXing barcode scanner for medicine batch verification.</li>
+                    <li>Established a complete CI/CD pipeline using GitHub Actions to automate static checks, builds, and containerized deployment across Vercel and Hugging Face Spaces.</li>
+                    <li>Integrated PostgreSQL for structured relational data and Redis for caching, ensuring high-performance data retrieval and session management.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ PAGE 2 ═══════ -->
+<div class="page" id="page-2">
+    <div class="section continued">
+        <div class="entry">
+            <div class="entry-header">
+                <div class="entry-title">Khatawali Records</div>
+                <div class="entry-meta">React, Supabase, Bootstrap</div>
+            </div>
+            <div class="entry-desc">
+                <ul>
+                    <li>Engineered a mobile-first, comprehensive credit and debit ledger application designed for small business owners and individuals to manage financial transactions.</li>
+                    <li>Packaged the application natively for Android using Capacitor, enabling seamless mobile features like an in-app contact importer and deep linking capabilities.</li>
+                    <li>Designed a scalable PostgreSQL database schema on Supabase, leveraging Row Level Security (RLS) policies and Supabase Auth to guarantee user data privacy.</li>
+                    <li>Implemented robust category-wise separation, allowing users to track the same person across multiple independent ledger categories seamlessly.</li>
+                    <li>Developed an advanced filtering and search dashboard supporting date-range queries, year/month summaries, and instant person-lookup by name or phone number.</li>
+                    <li>Integrated high-value export functionalities utilizing jsPDF and PapaParse, allowing users to download per-person transaction histories as PDFs or Excel files.</li>
+                    <li>Enhanced application security and user experience by implementing biometric fingerprint locking mechanisms configurable directly within the app settings.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="entry">
+            <div class="entry-header">
+                <div class="entry-title">Scholar Nexus</div>
+                <div class="entry-meta">Next.js, TypeScript, Tailwind CSS, Prisma</div>
+            </div>
+            <div class="entry-desc">
+                <ul>
+                    <li>Architected an AI-powered, multi-source research paper discovery and synthesis platform that parallel queries nine major academic databases simultaneously.</li>
+                    <li>Developed an advanced deduplication algorithm that merges records by DOI and title similarity, ensuring the richest metadata is preserved across all sources.</li>
+                    <li>Implemented an intelligent ranking engine that scores papers across six dimensions including semantic relevance, citation impact, recency, and open-access availability.</li>
+                    <li>Integrated a cutting-edge AI evidence synthesis feature that analyzes multiple papers to identify consensus, contradictions, research gaps, and key findings.</li>
+                    <li>Built an interactive, D3.js force-directed citation network graph, allowing users to visually explore references and citing papers for any given publication.</li>
+                    <li>Embedded a PDF full-text Q&amp;A chatbot capable of answering complex user questions by directly analyzing the extracted text of the research papers.</li>
+                    <li>Engineered personalized features including color-coded reading collections, automated daily/weekly search alerts, author profiles, and persistent search history.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="entry">
+            <div class="entry-header">
+                <div class="entry-title">Air Pollution Tracker V2.0</div>
+                <div class="entry-meta">React, Tailwind CSS, Supabase, Mapbox</div>
+            </div>
+            <div class="entry-desc">
+                <ul>
+                    <li>Created a modern, data-driven React application that visualizes live and historical air-quality metrics for a catalog of over 200 cities worldwide.</li>
+                    <li>Implemented differentiated, role-based dashboards catering to both regular citizens (quick stats, advisories) and government officials (incident desks, heatmaps).</li>
+                    <li>Built interactive, high-density map views utilizing React Leaflet and Mapbox, featuring clustered markers and geolocation to seamlessly track air quality hotspots.</li>
+                    <li>Designed a robust data layer using React Query for stale-while-revalidate caching, optimistic updates, and background refreshing of OpenAQ API snapshots.</li>
+                    <li>Developed comprehensive Phase 5 analytics dashboards to deliver single-city deep dives, forecasting bands, health advisories, and source attribution analysis.</li>
+                    <li>Integrated Supabase for secure authentication, persistent offline-friendly user preferences, and an audit logging pipeline for monitoring government routing access.</li>
+                    <li>Optimized frontend performance with virtualized list rendering via react-window, ensuring smooth scrolling through hundreds of live environmental sensors.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
