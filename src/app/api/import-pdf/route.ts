@@ -40,13 +40,10 @@ function extractColorsFromOps(ops: any, pdfjsOps: any): Map<string, string> {
       const maxVal = Math.max(r, g, b);
 
       if (maxVal <= 1) {
-        // Already normalized 0-1
         currentColor = [r, g, b];
       } else if (maxVal <= 255) {
-        // 8-bit integers (0-255) — common in many PDFs
         currentColor = [r / 255, g / 255, b / 255];
       } else {
-        // 16-bit fixed point (0-65535)
         currentColor = [r / 65535, g / 65535, b / 65535];
       }
     }
@@ -54,11 +51,9 @@ function extractColorsFromOps(ops: any, pdfjsOps: any): Map<string, string> {
     // Track font being set
     if (fn === pdfjsOps.setFont) {
       currentFont = args[0] || "";
-      // Map font → color
+      // Map font → color (update every time to catch color changes for same font)
       const hex = rgbToHex(currentColor[0], currentColor[1], currentColor[2]);
-      if (!fontColorMap.has(currentFont)) {
-        fontColorMap.set(currentFont, hex);
-      }
+      fontColorMap.set(currentFont, hex);
     }
   }
 
@@ -79,18 +74,40 @@ function detectDividersFromOps(ops: any, pdfjsOps: any, pageHeight: number): { w
       currentLineWidth = args[0] || 0;
     }
 
-    // Track position from transform/moveTo
     if (fn === pdfjsOps.moveTo) {
       if (args.length >= 2) currentY = args[1];
     }
 
-    // A stroke after moveTo+lineTo could be a horizontal line (divider)
     if (fn === pdfjsOps.stroke && currentLineWidth > 0) {
       dividers.push({ weight: currentLineWidth, y: currentY });
     }
   }
 
   return dividers;
+}
+
+// ─── Histogram-based margin detection ───
+// Instead of min/max (which outliers distort), use the most common left edge
+function detectMarginFromPositions(positions: number[], tolerance: number = 3): number {
+  if (positions.length === 0) return 56;
+  // Build a frequency histogram
+  const freq: Record<number, number> = {};
+  for (const pos of positions) {
+    const rounded = Math.round(pos / tolerance) * tolerance;
+    freq[rounded] = (freq[rounded] || 0) + 1;
+  }
+  // Find the most common position (the margin)
+  const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+  return parseFloat(sorted[0][0]);
+}
+
+// Detect page size (A4 vs Letter)
+function detectPageSize(width: number, height: number): "a4" | "letter" {
+  // A4: 595.28 x 841.89 pt
+  // Letter: 612 x 792 pt
+  const a4Diff = Math.abs(width - 595.28) + Math.abs(height - 841.89);
+  const letterDiff = Math.abs(width - 612) + Math.abs(height - 792);
+  return a4Diff < letterDiff ? "a4" : "letter";
 }
 
 export async function POST(req: NextRequest) {
@@ -127,15 +144,9 @@ export async function POST(req: NextRequest) {
       let ops: any = null;
       try {
         ops = await page.getOperatorList();
-
-        // Extract color → font mapping
         fontColorMap = extractColorsFromOps(ops, pdfjs.OPS);
-
-        // Detect dividers
         const pageDividers = detectDividersFromOps(ops, pdfjs.OPS, viewport.height);
         allDividers.push(...pageDividers);
-
-        // Photo detection
         if (ops.fnArray.includes(pdfjs.OPS.paintImageXObject)) {
           hasPhoto = true;
         }
@@ -166,7 +177,6 @@ export async function POST(req: NextRequest) {
 
         // Get color from operator list mapping
         let color = fontColorMap.get(fontName) || "#000000";
-        // Also check style for color
         try {
           if (styleInfo.color) {
             if (Array.isArray(styleInfo.color) && styleInfo.color.length >= 3) {
@@ -226,10 +236,12 @@ export async function POST(req: NextRequest) {
     const pageWidth = pages[0]?.width || 612;
     const pageHeight = pages[0]?.height || 792;
 
+    // 0. PAGE SIZE detection
+    const pageSize = detectPageSize(pageWidth, pageHeight);
+
     // 1. FONT FAMILY — prefer fontFamily from styles, fall back to fontName
     const fontCounts: Record<string, number> = {};
     for (const item of allItems) {
-      // Use fontFamily from PDF styles if available, else normalize fontName
       const rawFont = item.fontFamily || item.fontName;
       if (rawFont) {
         const clean = rawFont.replace(/^g_d\d+_f/, "Font").replace(/^C\./, "").replace(/\+/, " ");
@@ -237,10 +249,8 @@ export async function POST(req: NextRequest) {
       }
     }
     const dominantFont = Object.entries(fontCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "Inter";
-    // If the dominant font is a generic family (like "sans-serif"), try to find a more specific one
     let fontFamily = normalizeFontName(dominantFont);
     if (fontFamily === "sans-serif" || fontFamily === "serif" || fontFamily === "monospace") {
-      // Look for a non-generic font in the list
       const specificFont = Object.entries(fontCounts)
         .sort((a, b) => b[1] - a[1])
         .find(([name]) => {
@@ -248,11 +258,12 @@ export async function POST(req: NextRequest) {
           return normalized !== "sans-serif" && normalized !== "serif" && normalized !== "monospace";
         });
       if (specificFont) fontFamily = normalizeFontName(specificFont[0]);
-      else if (fontFamily === "sans-serif") fontFamily = "Helvetica"; // most common sans-serif in PDFs
+      else if (fontFamily === "sans-serif") fontFamily = "Helvetica";
       else if (fontFamily === "serif") fontFamily = "Times New Roman";
     }
 
-    // 2. FONT SIZES — classify by role
+    // 2. FONT SIZES — improved role classification using position + style
+    // Build frequency map of all font sizes
     const sizeFreq: Record<number, number> = {};
     for (const item of allItems) {
       const rounded = Math.round(item.fontSize * 2) / 2;
@@ -262,143 +273,234 @@ export async function POST(req: NextRequest) {
       .map(([s, f]) => ({ size: parseFloat(s), freq: f }))
       .sort((a, b) => b.freq - a.freq);
 
-    // Name size = largest font on first page top portion
-    const nameSizeCandidates = firstPageItems
-      .filter(item => item.y > pageHeight * 0.5) // top half (PDF Y is from bottom)
+    // Name size = largest font in the top 30% of the first page
+    // PDF Y goes from bottom (0) to top (height), so top 30% = y > pageHeight * 0.7
+    const topRegionItems = firstPageItems.filter(item => item.y > pageHeight * 0.7);
+    const nameSizeCandidates = topRegionItems
       .map(item => item.fontSize)
       .sort((a, b) => b - a);
+    // The name is typically the largest text item in the top region
     const nameSize = nameSizeCandidates[0] || sortedSizes[0]?.size || 26;
 
-    // Section header size = bold uppercase text that isn't the name
-    const sectionSizeCandidates = allItems
-      .filter(item => item.isBold && item.str === item.str.toUpperCase() && item.str.length > 2 && item.str.length < 30 && item.fontSize < nameSize)
-      .map(item => item.fontSize);
+    // Section header size — improved detection:
+    // Look for bold text that is ALL CAPS or short headings, smaller than name
+    // Also consider items that are the start of new "blocks" (significant Y gap from previous)
+    const sectionSizeCandidates: number[] = [];
+
+    // Method A: Bold + ALL CAPS + reasonable length
+    for (const item of allItems) {
+      if (item.isBold && item.str === item.str.toUpperCase() &&
+          item.str.length > 2 && item.str.length < 30 &&
+          item.fontSize < nameSize && item.fontSize > 7) {
+        sectionSizeCandidates.push(item.fontSize);
+      }
+    }
+
+    // Method B: Bold text that appears right before a group of smaller text (section header pattern)
+    // We detect this by looking at consecutive items in Y order
+    const sortedByY = [...firstPageItems].sort((a, b) => b.y - a.y);
+    for (let i = 0; i < sortedByY.length - 3; i++) {
+      const item = sortedByY[i];
+      const nextItems = sortedByY.slice(i + 1, i + 4);
+      // If this bold item is followed by smaller non-bold items → likely a section header
+      if (item.isBold && item.fontSize < nameSize && item.fontSize > 7) {
+        const isFollowedBySmaller = nextItems.some(n =>
+          !n.isBold && n.fontSize < item.fontSize && Math.abs(n.y - item.y) < item.fontSize * 4
+        );
+        if (isFollowedBySmaller || item.str === item.str.toUpperCase()) {
+          sectionSizeCandidates.push(item.fontSize);
+        }
+      }
+    }
+
     const sectionSize = sectionSizeCandidates.length > 0
       ? modeOf(sectionSizeCandidates)
       : (sortedSizes.find(s => s.size < nameSize && s.size >= 10)?.size || 12);
 
-    // Body size = most common small font
-    const bodySize = sortedSizes.find(s => s.size < sectionSize && s.size >= 7)?.size || 9.5;
+    // Body size = most common font size that's smaller than section size
+    // Use character-length weighted frequency for accuracy
+    const bodySizeCandidates = sortedSizes.filter(s => s.size < sectionSize && s.size >= 7);
+    const bodySize = bodySizeCandidates.length > 0
+      ? bodySizeCandidates[0].size  // most frequent (already sorted by freq)
+      : 9.5;
 
-    // Meta/contact size
-    const metaSize = sortedSizes.find(s => s.size <= bodySize && s.size >= 7)?.size || bodySize;
+    // Meta/contact size — typically same as body or slightly smaller, used for contact info
+    const metaSizeCandidates = sortedSizes.filter(s => s.size <= bodySize + 0.5 && s.size >= 7);
+    const metaSize = metaSizeCandidates.length > 0
+      ? metaSizeCandidates[0].size
+      : bodySize;
 
-    // Entry title size = bold text between section and body
+    // Entry title size = bold text between section and body sizes
     const entryTitleCandidates = allItems
-      .filter(item => item.isBold && item.fontSize > bodySize && item.fontSize < nameSize && Math.abs(item.fontSize - sectionSize) > 0.5)
+      .filter(item => item.isBold && item.fontSize >= bodySize && item.fontSize < sectionSize && item.fontSize < nameSize)
       .map(item => item.fontSize);
     const entryTitleSize = entryTitleCandidates.length > 0
       ? modeOf(entryTitleCandidates)
       : Math.round(((bodySize + sectionSize) / 2) * 10) / 10;
 
-    // 3. COLORS — from operator list extraction
-    // Weight colors by "importance": bold/large text counts more than body text
+    // 3. COLORS — improved with per-item tracking
     const colorFreq: Record<string, number> = {};
     for (const item of allItems) {
       const c = item.color.toLowerCase();
-      if (c === "#000000" || c === "#000" || c === "#010000" || c === "#000100") continue;
-      // Weight: bold text × 3, large text (headings) × 2, body text × 1
-      const isHeading = item.fontSize >= sectionSize || item.isBold;
-      const weight = item.isBold ? 3 : (isHeading ? 2 : 1);
-      colorFreq[c] = (colorFreq[c] || 0) + item.str.length * weight;
+      if (c === "#000000" || c === "#000" || c === "#010000" || c === "#000100" || c === "#010001") continue;
+      // Weight: name-sized text × 5, bold × 3, heading × 2, body × 1
+      let weight = item.str.length;
+      if (item.fontSize >= nameSize - 1) weight *= 5;
+      else if (item.isBold) weight *= 3;
+      else if (item.fontSize >= sectionSize) weight *= 2;
+      colorFreq[c] = (colorFreq[c] || 0) + weight;
     }
     const sortedColors = Object.entries(colorFreq)
       .sort((a, b) => b[1] - a[1])
       .map(([c]) => c);
 
-    // Primary = most used accent color (typically for headings/names)
-    // Secondary = second accent color (for contact info, meta)
     const primaryColor = sortedColors[0] || "#2E2C2C";
     const secondaryColor = sortedColors[1] || "#666464";
     const accentColor = sortedColors.find(c => c !== primaryColor) || primaryColor;
 
-    // 4. MARGINS — from text positions relative to page edges
-    // Use only substantial content items (not stray single-char items)
+    // 4. MARGINS — improved histogram-based detection
+    // Only use substantial content items (length > 1, width > 5) from first page
     const contentItems = firstPageItems.filter(item => item.str.length > 1 && item.width > 5);
-    const leftMargin = contentItems.length > 0 ? Math.max(0, Math.min(...contentItems.map(item => item.x))) : 56;
-    const rightEdge = contentItems.length > 0 ? Math.max(...contentItems.map(item => item.x + item.width)) : (pageWidth - 56);
-    const rightMargin = Math.max(0, pageWidth - rightEdge);
-    const topEdge = contentItems.length > 0 ? Math.max(...contentItems.map(item => item.y)) : (pageHeight - 72);
-    const topMargin = Math.max(0, pageHeight - topEdge);
-    const bottomEdge = contentItems.length > 0 ? Math.min(...contentItems.map(item => item.y)) : 72;
-    const bottomMargin = Math.max(0, bottomEdge);
 
-    const margins = {
-      top: clampMargin(topMargin),
-      right: clampMargin(rightMargin),
-      bottom: clampMargin(bottomMargin),
-      left: clampMargin(leftMargin),
+    // Left margin: most common x position of content starts
+    const leftPositions = contentItems.map(item => item.x);
+    const leftMarginRaw = detectMarginFromPositions(leftPositions);
+
+    // Right margin: most common right edge, then subtract from page width
+    const rightPositions = contentItems.map(item => item.x + item.width);
+    const rightEdgeRaw = detectMarginFromPositions(rightPositions);
+    const rightMarginRaw = Math.max(0, pageWidth - rightEdgeRaw);
+
+    // Top margin: highest y position (PDF y goes up)
+    const topPositions = contentItems.map(item => item.y);
+    const topEdgeRaw = detectMarginFromPositions(topPositions);
+    const topMarginRaw = Math.max(0, pageHeight - topEdgeRaw);
+
+    // Bottom margin: lowest y position
+    const bottomPositions = contentItems.map(item => item.y);
+    const bottomEdgeRaw = contentItems.length > 0 ? Math.min(...bottomPositions) : 72;
+    const bottomMarginRaw = Math.max(0, bottomEdgeRaw);
+
+    let margins = {
+      top: clampMargin(topMarginRaw),
+      right: clampMargin(rightMarginRaw),
+      bottom: clampMargin(bottomMarginRaw),
+      left: clampMargin(leftMarginRaw),
     };
 
-    // If right/bottom margins seem unreasonably large (content doesn't fill the page),
-    // assume symmetrical margins based on left/top
-    if (margins.right > margins.left * 2) margins.right = margins.left;
+    // Symmetry adjustments — resumes typically have similar left/right and top/bottom
+    if (margins.right > margins.left * 2.5) margins.right = margins.left;
+    if (margins.left > margins.right * 2.5) margins.left = margins.right;
     if (margins.bottom > margins.top * 2) margins.bottom = margins.top;
-    // If bottom margin is still much larger than top, use top as bottom (common for resumes)
-    if (margins.bottom > margins.top * 1.2 && margins.top < 100) margins.bottom = margins.top;
+    if (margins.top > margins.bottom * 2) margins.top = margins.bottom;
 
-    // 5. HEADER ALIGNMENT
+    // 5. HEADER ALIGNMENT — improved detection
+    // Check all items in the name-sized range for center vs left alignment
     const nameItems = firstPageItems.filter(item => item.fontSize >= nameSize - 1);
     let headerAlign: "center" | "left" = "left";
     if (nameItems.length > 0) {
       const nameCenterX = nameItems.reduce((sum, item) => sum + item.x + item.width / 2, 0) / nameItems.length;
       const pageCenter = pageWidth / 2;
       const offset = Math.abs(nameCenterX - pageCenter);
-      headerAlign = offset < pageWidth * 0.1 ? "center" : "left";
+      headerAlign = offset < pageWidth * 0.08 ? "center" : "left";
+    }
+    // Also check contact info (meta-sized items near the top) for alignment
+    const headerMetaItems = firstPageItems.filter(item =>
+      item.fontSize <= metaSize + 1 && item.y > pageHeight * 0.6
+    );
+    if (headerMetaItems.length > 3) {
+      const metaCenterX = headerMetaItems.reduce((sum, item) => sum + item.x + item.width / 2, 0) / headerMetaItems.length;
+      const pageCenter = pageWidth / 2;
+      const metaOffset = Math.abs(metaCenterX - pageCenter);
+      // If meta items are centered, override to center
+      if (metaOffset < pageWidth * 0.08 && headerAlign === "left") {
+        headerAlign = "center";
+      }
     }
 
-    // 6. LINE HEIGHT — from Y gaps between body-sized items within paragraphs
-    // Only consider consecutive items with the SAME font size that are close together
-    // (within the same paragraph), not items separated by paragraph breaks
+    // 6. LINE HEIGHT — improved with same-font-size consecutive items
     const sameSizeItems = allItems
       .filter(item => Math.abs(item.fontSize - bodySize) < 1)
       .sort((a, b) => b.y - a.y);
     let lineHeight = 1.5;
     if (sameSizeItems.length > 2) {
       const yDiffs: number[] = [];
-      for (let i = 1; i < Math.min(sameSizeItems.length, 50); i++) {
+      for (let i = 1; i < Math.min(sameSizeItems.length, 80); i++) {
         const diff = Math.abs(sameSizeItems[i - 1].y - sameSizeItems[i].y);
-        // Only include gaps that look like line spacing (1x to 2x the font size)
-        // Skip larger gaps which are paragraph breaks
-        if (diff > bodySize * 0.8 && diff < bodySize * 2.2) yDiffs.push(diff);
+        if (diff > bodySize * 0.8 && diff < bodySize * 2.5) yDiffs.push(diff);
       }
       if (yDiffs.length > 0) {
-        // Use the mode (most common gap) rather than average to avoid paragraph breaks
         const avgLineGap = modeOf(yDiffs, 0.5);
         lineHeight = Math.round((avgLineGap / bodySize) * 20) / 20;
-        lineHeight = Math.max(1, Math.min(2, lineHeight));
+        lineHeight = Math.max(1, Math.min(2.5, lineHeight));
       }
     }
 
-    // 7. LETTER SPACING
+    // 7. LETTER SPACING — detect from font characteristics
     const nameLetterSpacing = /condensed|narrow|compact/i.test(dominantFont) ? 0 : 2.5;
     const sectionLetterSpacing = 1;
 
-    // 8. SECTION/ENTRY SPACING
-    const sectionSpacing = 8;
-    const entrySpacing = 8;
+    // 8. SECTION/ENTRY SPACING — detect from Y gaps between sections
+    let sectionSpacing = 8;
+    let entrySpacing = 8;
+    // Look for Y gaps larger than line height but smaller than section breaks
+    if (firstPageItems.length > 5) {
+      const sortedFirst = [...firstPageItems].sort((a, b) => b.y - a.y);
+      const gaps: number[] = [];
+      for (let i = 1; i < sortedFirst.length; i++) {
+        const gap = Math.abs(sortedFirst[i - 1].y - sortedFirst[i].y);
+        // Gaps between line-height × 2 and line-height × 6 are section/entry spacing
+        if (gap > bodySize * lineHeight * 1.5 && gap < bodySize * lineHeight * 6) {
+          gaps.push(gap);
+        }
+      }
+      if (gaps.length > 2) {
+        const avgGap = modeOf(gaps, 1);
+        // Convert to pt (approximate)
+        sectionSpacing = Math.round(avgGap * 0.6);
+        entrySpacing = Math.round(avgGap * 0.4);
+        sectionSpacing = Math.max(4, Math.min(20, sectionSpacing));
+        entrySpacing = Math.max(4, Math.min(16, entrySpacing));
+      }
+    }
 
     // 9. DIVIDER WEIGHT — from detected horizontal lines
     let dividerWeight = 0.75;
     if (allDividers.length > 0) {
       const avgWeight = allDividers.reduce((sum, d) => sum + d.weight, 0) / allDividers.length;
-      dividerWeight = Math.round(avgWeight * 4) / 4; // round to 0.25
+      dividerWeight = Math.round(avgWeight * 4) / 4;
       dividerWeight = Math.max(0.25, Math.min(3, dividerWeight));
     }
 
-    // 10. FOOTER DETECTION
+    // 10. FOOTER DETECTION — improved with multi-page analysis
     const lastPageItems = pages[numPages - 1]?.items || [];
-    const footerItems = lastPageItems.filter(item => item.y < pageHeight * 0.1);
+    // Footer region = bottom 15% of the page (PDF y < 15% of height)
+    const footerItems = lastPageItems.filter(item => item.y < pageHeight * 0.15);
     const hasPageNumbers = footerItems.some(item => /^\d+$/.test(item.str.trim()) && item.str.trim().length <= 2);
-    const hasNameInFooter = footerItems.some(item => item.fontSize < bodySize + 1);
-
-    // 11. SUBTITLE DETECTION
-    const showSubtitle = firstPageItems.some(item =>
-      item.fontSize < nameSize &&
-      item.fontSize > bodySize &&
-      item.y > (pageHeight - topMargin - nameSize * 3) &&
-      item.y < (pageHeight - topMargin + nameSize)
+    // Check for name-like text in footer (text smaller than body, at very bottom)
+    const hasNameInFooter = footerItems.some(item =>
+      item.fontSize <= metaSize + 1 && item.str.length > 3 && !/^\d+$/.test(item.str.trim())
     );
+    // Extract custom footer text (e.g., "Page 1 of 2", "References available")
+    let customFooterText = "";
+    const footerTextParts = footerItems
+      .filter(item => item.str.trim().length > 2 && !/^\d+$/.test(item.str.trim()))
+      .map(item => item.str.trim());
+    if (footerTextParts.length > 0 && !hasPageNumbers) {
+      customFooterText = footerTextParts.join(" ").substring(0, 50);
+    }
+
+    // 11. SUBTITLE DETECTION — improved
+    // Subtitle = text near the name that's smaller than name but larger than body
+    const showSubtitle = firstPageItems.some(item => {
+      const nearName = nameItems.length > 0
+        ? Math.abs(item.y - nameItems[0].y) < nameSize * 2.5
+        : item.y > pageHeight * 0.6;
+      return nearName &&
+             item.fontSize < nameSize &&
+             item.fontSize > bodySize + 1 &&
+             !item.isBold;
+    });
 
     // Parse resume structure
     const resumeData = parseResumeText(text);
@@ -427,7 +529,7 @@ export async function POST(req: NextRequest) {
       sectionSpacing,
       entrySpacing,
       dividerWeight,
-      footer: { showPageNumbers: hasPageNumbers, showName: hasNameInFooter, customText: "" },
+      footer: { showPageNumbers: hasPageNumbers, showName: hasNameInFooter, customText: customFooterText },
       showSubtitle,
     });
 
@@ -437,6 +539,7 @@ export async function POST(req: NextRequest) {
       format: detectedFormat,
       rawText: text,
       pageCount: numPages,
+      pageSize,  // pass detected page size
     });
   } catch (error: unknown) {
     console.error("PDF import error:", error);

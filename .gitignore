@@ -52,3 +52,10 @@ prompt
 server.log
 # Skills directory
 /skills/
+# Project specific
+/download/
+/worklog.md
+/scripts/lightweight-server.js
+/scripts/keep-server.sh
+/db/
+/tool-results/

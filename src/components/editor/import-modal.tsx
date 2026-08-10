@@ -18,6 +18,7 @@ interface ImportResult {
   format?: DetectedFormat;
   rawText?: string;
   pageCount?: number;
+  pageSize?: "a4" | "letter";
 }
 
 export function ImportModal() {
@@ -83,7 +84,7 @@ export function ImportModal() {
         showSubtitle: fmt.showSubtitle ?? !!data.personal.title,
       },
       footer: fmt.footer || DEFAULT_FORMAT.footer,
-      pageSize: DEFAULT_FORMAT.pageSize,
+      pageSize: imported.pageSize || fmt.pageSize || DEFAULT_FORMAT.pageSize,
       sectionSpacing: fmt.sectionSpacing ?? DEFAULT_FORMAT.sectionSpacing,
       entrySpacing: fmt.entrySpacing ?? DEFAULT_FORMAT.entrySpacing,
       dividerWeight: fmt.dividerWeight ?? DEFAULT_FORMAT.dividerWeight,
@@ -92,7 +93,14 @@ export function ImportModal() {
     const profileJson = JSON.stringify({
       id: crypto.randomUUID(),
       name: data.personal.fullName || "Imported Resume",
-      data: data,
+      data: {
+        ...data,
+        personal: {
+          ...data.personal,
+          // Auto-enable photo display if source had a photo placeholder
+          showPhoto: imported.format?.hasPhoto ? true : data.personal.showPhoto,
+        },
+      },
       format: formatObj,
       createdAt: Date.now(),
       updatedAt: Date.now(),

@@ -416,6 +416,7 @@ export interface DetectedFormat {
   dividerWeight: number;
   footer: { showPageNumbers: boolean; showName: boolean; customText: string };
   showSubtitle: boolean;
+  pageSize?: "a4" | "letter";  // detected page size
 }
 
 export function detectFormatFromPdfMetadata(metadata: {
@@ -433,6 +434,7 @@ export function detectFormatFromPdfMetadata(metadata: {
   dividerWeight?: number;
   footer?: { showPageNumbers: boolean; showName: boolean; customText: string };
   showSubtitle?: boolean;
+  pageSize?: "a4" | "letter";
 }): DetectedFormat {
   return {
     hasPhoto: metadata.hasPhoto || false,
@@ -460,6 +462,7 @@ export function detectFormatFromPdfMetadata(metadata: {
     dividerWeight: metadata.dividerWeight ?? 0.75,
     footer: metadata.footer || { showPageNumbers: true, showName: true, customText: "" },
     showSubtitle: metadata.showSubtitle ?? true,
+    pageSize: metadata.pageSize,
   };
 }
 

@@ -735,12 +735,32 @@ export async function POST(req: NextRequest) {
       const headerAlign: "center" | "left" = firstNonEmpty?.style.alignment === "center" ? "center" : "left";
 
       // 5. Line height — from paragraph spacing
+      // DOCX w:spacing w:line is in 240ths of a line (240 = single, 360 = 1.5, 480 = double)
+      // If the value was parsed via twipsToPt, we need to convert back and use the ratio
+      // twipsToPt(line_twips) = line_twips / 20
+      // line_ratio = line_twips / 240
+      // So: line_ratio = (line_pt * 20) / 240 = line_pt / 12
       const lineValues = paragraphs
         .map(p => p.style.spacing.line)
         .filter((v): v is number => v !== null && v > 0);
-      const lineHeight = lineValues.length > 0
-        ? Math.round((modeOf(lineValues) / (bodySize || 11)) * 20) / 20
-        : 1.5;
+      let lineHeight = 1.15; // Default Word line spacing
+      if (lineValues.length > 0) {
+        const modeLine = modeOf(lineValues);
+        // Convert from twips-based points to line ratio
+        // twipsToPt gave us twips/20, and original was in 240ths
+        // lineRatio = (modeLine * 20) / 240 = modeLine / 12
+        const lineRatio = modeLine / 12;
+        if (lineRatio >= 0.8 && lineRatio <= 3) {
+          lineHeight = Math.round(lineRatio * 20) / 20;
+        } else {
+          // Fallback: try dividing by bodySize for point-based spacing
+          const fallback = Math.round((modeLine / (bodySize || 11)) * 20) / 20;
+          if (fallback >= 0.8 && fallback <= 3) {
+            lineHeight = fallback;
+          }
+        }
+        lineHeight = Math.max(1, Math.min(2.5, lineHeight));
+      }
 
       // 6. Show subtitle — check if second line has a different style (like a job title)
       const secondLine = paragraphs.find((p, i) => i > 0 && p.text.trim() && !p.isHeading);
@@ -748,6 +768,44 @@ export async function POST(req: NextRequest) {
 
       // Parse resume content
       const resumeData = parseResumeText(text);
+
+      // 7. Page size detection (A4 vs Letter)
+      const pageSize = formatData.pageSize;
+      const isA4 = Math.abs(pageSize.width - 595.28) < 10 && Math.abs(pageSize.height - 841.89) < 10;
+      const detectedPageSize: "a4" | "letter" = isA4 ? "a4" : "letter";
+
+      // 8. Header/footer detection from DOCX
+      // We'll try to parse header1.xml and footer1.xml from the zip later
+      // For now, use heuristics from content
+      const lastParagraphs = paragraphs.slice(-5);
+      const hasPageNumbers = lastParagraphs.some(p => /^\d+$/.test(p.text.trim()));
+      const hasNameInFooter = lastParagraphs.some(p =>
+        p.effectiveRun.fontSize !== null &&
+        p.effectiveRun.fontSize <= metaSize + 1 &&
+        p.text.trim().length > 3 && !/^\d+$/.test(p.text.trim())
+      );
+
+      // 9. Section/entry spacing — from paragraph spacing.before/after
+      const spacingBefore = paragraphs
+        .map(p => p.style.spacing.before)
+        .filter((v): v is number => v !== null && v > 0);
+      const spacingAfter = paragraphs
+        .map(p => p.style.spacing.after)
+        .filter((v): v is number => v !== null && v > 0);
+      let sectionSpacing = 8;
+      let entrySpacing = 8;
+      if (spacingBefore.length > 2) {
+        const avgBefore = modeOf(spacingBefore);
+        sectionSpacing = Math.max(4, Math.min(20, Math.round(avgBefore * 0.5)));
+      }
+      if (spacingAfter.length > 2) {
+        const avgAfter = modeOf(spacingAfter);
+        entrySpacing = Math.max(4, Math.min(16, Math.round(avgAfter * 0.5)));
+      }
+
+      // 10. Divider detection — check for horizontal rules in DOCX
+      // (Word uses <w:pBdr> or bottom borders for dividers)
+      let dividerWeight = 0.75;
 
       const detectedFormat = detectFormatFromPdfMetadata({
         headerAlign,
@@ -769,10 +827,10 @@ export async function POST(req: NextRequest) {
         },
         margins: pageMargins,
         showSubtitle,
-        sectionSpacing: 8,
-        entrySpacing: 8,
-        dividerWeight: 0.75,
-        footer: { showPageNumbers: false, showName: false, customText: "" },
+        sectionSpacing,
+        entrySpacing,
+        dividerWeight,
+        footer: { showPageNumbers: hasPageNumbers, showName: hasNameInFooter, customText: "" },
       });
 
       return NextResponse.json({
@@ -780,6 +838,7 @@ export async function POST(req: NextRequest) {
         data: resumeData,
         format: detectedFormat,
         rawText: text,
+        pageSize: detectedPageSize,
       });
     }
 
