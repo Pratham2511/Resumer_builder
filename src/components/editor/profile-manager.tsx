@@ -6,18 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Plus, Copy, Trash2, Download, Upload } from "lucide-react";
+import { Plus, Copy, Trash2, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ImportModal } from "./import-modal";
 
 export function ProfileManager() {
-  const { profiles, activeProfileId, createProfile, deleteProfile, renameProfile, switchProfile, duplicateProfile, exportProfile, importProfile } = useResumeStore();
+  const { profiles, activeProfileId, createProfile, deleteProfile, renameProfile, switchProfile, duplicateProfile, exportProfile } = useResumeStore();
   const { toast } = useToast();
   const [newName, setNewName] = useState("");
   const [dupName, setDupName] = useState("");
   const [showNew, setShowNew] = useState(false);
   const [showDup, setShowDup] = useState(false);
-  const [importJson, setImportJson] = useState("");
-  const [showImport, setShowImport] = useState(false);
 
   const active = profiles.find((p) => p.id === activeProfileId);
 
@@ -48,17 +47,6 @@ export function ProfileManager() {
     a.click();
     URL.revokeObjectURL(url);
     toast({ title: "Exported", description: "Profile saved as JSON" });
-  };
-
-  const handleImport = () => {
-    const id = importProfile(importJson);
-    if (id) {
-      setShowImport(false);
-      setImportJson("");
-      toast({ title: "Imported successfully" });
-    } else {
-      toast({ title: "Import failed", description: "Invalid JSON format", variant: "destructive" });
-    }
   };
 
   const handleDelete = (id: string) => {
@@ -116,20 +104,9 @@ export function ProfileManager() {
             </DialogContent>
           </Dialog>
 
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleExport} title="Export"><Download className="h-3 w-3" /></Button>
+          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleExport} title="Export JSON"><Download className="h-3 w-3" /></Button>
 
-          <Dialog open={showImport} onOpenChange={setShowImport}>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6" title="Import"><Upload className="h-3 w-3" /></Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader><DialogTitle>Import Profile</DialogTitle></DialogHeader>
-              <textarea value={importJson} onChange={(e) => setImportJson(e.target.value)} placeholder="Paste JSON here..." className="w-full h-32 border rounded p-2 text-xs font-mono resize-none" />
-              <DialogFooter>
-                <Button size="sm" onClick={handleImport}>Import</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <ImportModal />
 
           <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleDelete(active.id)} title="Delete"><Trash2 className="h-3 w-3 text-destructive" /></Button>
         </div>

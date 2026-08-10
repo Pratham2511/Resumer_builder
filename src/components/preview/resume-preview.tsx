@@ -135,13 +135,24 @@ const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
     return (
       <div ref={ref} style={baseStyle}>
         {/* Header */}
-        <div style={{ textAlign: fmt.header.align as "center" | "left", marginBottom: "10pt" }}>
-          {data.personal.fullName && (
-            <div style={{ fontSize: `${fmt.fonts.nameSize}pt`, fontWeight: 700, letterSpacing: `${fmt.fonts.nameLetterSpacing}px`, textTransform: "uppercase" as const, color: fmt.colors.primary, lineHeight: 1.15, marginBottom: "6pt" }}>
-              {data.personal.fullName}
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: fmt.header.align === "center" ? "center" : "flex-start", marginBottom: "10pt", gap: "12pt" }}>
+          {/* Photo */}
+          {data.personal.showPhoto && data.personal.photoUrl && (
+            <div style={{ flexShrink: 0, alignSelf: fmt.header.align === "center" ? "center" : "flex-start" }}>
+              <img
+                src={data.personal.photoUrl}
+                alt="Profile"
+                style={{ width: "60pt", height: "60pt", borderRadius: "50%", objectFit: "cover", border: `1pt solid ${fmt.colors.divider}` }}
+              />
             </div>
           )}
-          {fmt.header.showSubtitle && data.personal.title && (
+          <div style={{ textAlign: fmt.header.align as "center" | "left", flex: 1 }}>
+            {data.personal.fullName && (
+              <div style={{ fontSize: `${fmt.fonts.nameSize}pt`, fontWeight: 700, letterSpacing: `${fmt.fonts.nameLetterSpacing}px`, textTransform: "uppercase" as const, color: fmt.colors.primary, lineHeight: 1.15, marginBottom: "6pt" }}>
+                {data.personal.fullName}
+              </div>
+            )}
+            {fmt.header.showSubtitle && data.personal.title && (
             <div style={{ fontSize: `${fmt.fonts.sectionSize + 2}pt`, fontWeight: 600, color: fmt.colors.primary, marginBottom: "6pt" }}>{data.personal.title}</div>
           )}
           {(contactItems.length > 0 || linkItems.length > 0) && (
@@ -150,6 +161,7 @@ const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
               {linkItems.map((item, i) => <span key={`l${i}`}>{item}</span>)}
             </div>
           )}
+          </div>
         </div>
 
         {/* Summary */}

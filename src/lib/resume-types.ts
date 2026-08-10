@@ -54,6 +54,8 @@ export interface PersonalInfo {
   linkedin: string;
   github: string;
   portfolio: string;
+  photoUrl: string;       // base64 data URL or empty
+  showPhoto: boolean;     // whether to display photo in resume
 }
 
 export interface SectionEntry {
@@ -144,6 +146,8 @@ export const DEFAULT_PERSONAL: PersonalInfo = {
   linkedin: "",
   github: "",
   portfolio: "",
+  photoUrl: "",
+  showPhoto: false,
 };
 
 export const DEFAULT_FORMAT: ResumeFormat = {

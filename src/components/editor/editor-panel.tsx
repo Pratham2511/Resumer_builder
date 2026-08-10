@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ChevronUp, ChevronDown, Plus, Trash2, GripVertical, Eye, EyeOff } from "lucide-react";
+import { ChevronUp, ChevronDown, Plus, Trash2, GripVertical, Eye, EyeOff, Upload, X } from "lucide-react";
 
 // ─── Personal Info Editor ───
 export function PersonalInfoEditor() {
@@ -45,6 +45,40 @@ export function PersonalInfoEditor() {
           />
         </div>
       ))}
+      {/* Photo Upload */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Switch checked={p.showPhoto} onCheckedChange={(v) => updatePersonal({ showPhoto: v })} />
+          <Label className="text-xs">Show photo in resume</Label>
+        </div>
+        {p.showPhoto && (
+          <div className="flex items-center gap-3">
+            {p.photoUrl ? (
+              <div className="relative">
+                <img src={p.photoUrl} alt="Profile" className="w-16 h-16 rounded-full object-cover border" />
+                <Button variant="ghost" size="icon" className="h-5 w-5 absolute -top-1 -right-1 bg-background border rounded-full" onClick={() => updatePersonal({ photoUrl: "", showPhoto: false })}>
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            ) : (
+              <label className="flex items-center justify-center w-16 h-16 rounded-full border-2 border-dashed border-muted-foreground/30 cursor-pointer hover:border-muted-foreground/60 transition-colors">
+                <Upload className="h-4 w-4 text-muted-foreground" />
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    const result = ev.target?.result as string;
+                    updatePersonal({ photoUrl: result, showPhoto: true });
+                  };
+                  reader.readAsDataURL(file);
+                }} />
+              </label>
+            )}
+            <span className="text-xs text-muted-foreground">Upload a profile photo (JPG/PNG)</span>
+          </div>
+        )}
+      </div>
       <div>
         <Label className="text-xs text-muted-foreground mb-1">Professional Summary</Label>
         <Textarea
