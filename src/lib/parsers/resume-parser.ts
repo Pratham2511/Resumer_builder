@@ -403,34 +403,147 @@ function parseSkillsEntries(lines: string[]): SectionEntry[] {
 // ─── Format Detection from PDF ───
 export interface DetectedFormat {
   hasPhoto: boolean;
-  colors: { primary: string; secondary: string; divider: string };
+  colors: { primary: string; secondary: string; accent: string; divider: string };
   margins: { top: number; right: number; bottom: number; left: number };
-  fontSizes: { name: number; section: number; body: number };
+  fontSizes: { name: number; section: number; body: number; meta: number; entryTitle: number };
+  fontFamily: string;
+  lineHeight: number;
+  nameLetterSpacing: number;
+  sectionLetterSpacing: number;
   headerAlign: "center" | "left";
+  sectionSpacing: number;
+  entrySpacing: number;
+  dividerWeight: number;
+  footer: { showPageNumbers: boolean; showName: boolean; customText: string };
+  showSubtitle: boolean;
 }
 
 export function detectFormatFromPdfMetadata(metadata: {
-  colors?: string[];
+  colors?: { primary?: string; secondary?: string; accent?: string; divider?: string };
   margins?: { top: number; right: number; bottom: number; left: number };
-  fontSizes?: number[];
+  fontSizes?: { name?: number; section?: number; body?: number; meta?: number; entryTitle?: number };
+  fontFamily?: string;
+  lineHeight?: number;
+  nameLetterSpacing?: number;
+  sectionLetterSpacing?: number;
   headerAlign?: "center" | "left";
   hasPhoto?: boolean;
+  sectionSpacing?: number;
+  entrySpacing?: number;
+  dividerWeight?: number;
+  footer?: { showPageNumbers: boolean; showName: boolean; customText: string };
+  showSubtitle?: boolean;
 }): DetectedFormat {
   return {
     hasPhoto: metadata.hasPhoto || false,
     colors: {
-      primary: metadata.colors?.[0] || "#2E2C2C",
-      secondary: metadata.colors?.[1] || "#666464",
-      divider: metadata.colors?.[0] || "#2E2C2C",
+      primary: metadata.colors?.primary || "#2E2C2C",
+      secondary: metadata.colors?.secondary || "#666464",
+      accent: metadata.colors?.accent || metadata.colors?.primary || "#2E2C2C",
+      divider: metadata.colors?.divider || metadata.colors?.primary || "#2E2C2C",
     },
     margins: metadata.margins || { top: 48, right: 60, bottom: 52, left: 60 },
     fontSizes: {
-      name: metadata.fontSizes?.[0] || 26,
-      section: metadata.fontSizes?.[1] || 12,
-      body: metadata.fontSizes?.[2] || 9.5,
+      name: metadata.fontSizes?.name || 26,
+      section: metadata.fontSizes?.section || 12,
+      body: metadata.fontSizes?.body || 9.5,
+      meta: metadata.fontSizes?.meta || metadata.fontSizes?.body || 9.5,
+      entryTitle: metadata.fontSizes?.entryTitle || 10.5,
     },
+    fontFamily: metadata.fontFamily || "Inter",
+    lineHeight: metadata.lineHeight || 1.5,
+    nameLetterSpacing: metadata.nameLetterSpacing ?? 2.5,
+    sectionLetterSpacing: metadata.sectionLetterSpacing ?? 1,
     headerAlign: metadata.headerAlign || "center",
+    sectionSpacing: metadata.sectionSpacing ?? 8,
+    entrySpacing: metadata.entrySpacing ?? 8,
+    dividerWeight: metadata.dividerWeight ?? 0.75,
+    footer: metadata.footer || { showPageNumbers: true, showName: true, customText: "" },
+    showSubtitle: metadata.showSubtitle ?? true,
   };
+}
+
+// ─── Font Name Normalization ───
+// Maps raw PDF/DOCX font names to clean CSS font family names
+export function normalizeFontName(raw: string): string {
+  if (!raw) return "Inter";
+  const lower = raw.toLowerCase().replace(/[-_+]/g, " ");
+
+  // Direct mappings for common resume fonts
+  const fontMap: Record<string, string> = {
+    "arial": "Arial",
+    "arialmt": "Arial",
+    "arial unicode ms": "Arial",
+    "helvetica": "Helvetica",
+    "timesnewroman": "Times New Roman",
+    "timesnewromanpsmt": "Times New Roman",
+    "times-roman": "Times New Roman",
+    "calibri": "Calibri",
+    "calibrimt": "Calibri",
+    "cambria": "Cambria",
+    "cambriamath": "Cambria",
+    "georgia": "Georgia",
+    "verdana": "Verdana",
+    "trebuchet": "Trebuchet MS",
+    "trebuchetms": "Trebuchet MS",
+    "garamond": "Garamond",
+    "book antiqua": "Book Antiqua",
+    "palatino": "Palatino",
+    "palatino linotype": "Palatino Linotype",
+    "century": "Century",
+    "century gothic": "Century Gothic",
+    "franklin": "Franklin Gothic",
+    "roboto": "Roboto",
+    "opensans": "Open Sans",
+    "open sans": "Open Sans",
+    "lato": "Lato",
+    "montserrat": "Montserrat",
+    "raleway": "Raleway",
+    "ptsans": "PT Sans",
+    "pt sans": "PT Sans",
+    "ptserif": "PT Serif",
+    "pt serif": "PT Serif",
+    "nunito": "Nunito",
+    "source sans": "Source Sans Pro",
+    "sourcesanspro": "Source Sans Pro",
+    "dejavusans": "DejaVu Sans",
+    "dejavu sans": "DejaVu Sans",
+    "dejavuserif": "DejaVu Serif",
+    "dejavu serif": "DejaVu Serif",
+    "liberationsans": "Liberation Sans",
+    "liberation sans": "Liberation Sans",
+    "liberationserif": "Liberation Serif",
+    "liberation serif": "Liberation Serif",
+    "noto sans": "Noto Sans",
+    "notosans": "Noto Sans",
+    "notoserif": "Noto Serif",
+    "noto serif": "Noto Serif",
+    "rpbolliviamtstandard": "Bolivia",
+    "gill sans": "Gill Sans",
+    "gillsans": "Gill Sans",
+    "consolas": "Consolas",
+    "courier": "Courier",
+    "couriernew": "Courier New",
+    "courier new": "Courier New",
+    "sansserif": "sans-serif",
+    "serif": "serif",
+    "monospace": "monospace",
+  };
+
+  // Try exact lowercase match
+  const cleaned = lower.replace(/\s+/g, "");
+  if (fontMap[cleaned]) return fontMap[cleaned];
+  if (fontMap[lower]) return fontMap[lower];
+
+  // Try partial match
+  for (const [key, value] of Object.entries(fontMap)) {
+    if (lower.includes(key) || key.includes(lower.replace(/\s/g, ""))) {
+      return value;
+    }
+  }
+
+  // Return the original with some cleanup
+  return raw.replace(/^([a-z])/i, (_, c) => c.toUpperCase());
 }
 
 // ─── Main Parse Function ───

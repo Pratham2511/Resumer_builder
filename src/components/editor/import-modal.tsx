@@ -2,7 +2,8 @@
 
 import React, { useState, useRef } from "react";
 import { useResumeStore } from "@/lib/resume-store";
-import { ResumeData, ResumeFormat, DEFAULT_FORMAT, DetectedFormat } from "@/lib/resume-types";
+import { ResumeData, ResumeFormat, DEFAULT_FORMAT } from "@/lib/resume-types";
+import { DetectedFormat } from "@/lib/parsers/resume-parser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
@@ -56,27 +57,43 @@ export function ImportModal() {
     // But first, the new profile has default sections — we need to work with those
     // Better approach: use importProfile with a constructed JSON
 
-    // Construct a full profile JSON
+    // Construct a full profile JSON with complete format mapping
+    const fmt = imported.format;
+    const formatObj: ResumeFormat = fmt ? {
+      margins: fmt.margins,
+      fonts: {
+        family: fmt.fontFamily || DEFAULT_FORMAT.fonts.family,
+        nameSize: fmt.fontSizes.name,
+        sectionSize: fmt.fontSizes.section,
+        bodySize: fmt.fontSizes.body,
+        metaSize: fmt.fontSizes.meta || fmt.fontSizes.body,
+        entryTitleSize: fmt.fontSizes.entryTitle || ((fmt.fontSizes.body + fmt.fontSizes.section) / 2),
+        lineHeight: fmt.lineHeight || DEFAULT_FORMAT.fonts.lineHeight,
+        nameLetterSpacing: fmt.nameLetterSpacing ?? DEFAULT_FORMAT.fonts.nameLetterSpacing,
+        sectionLetterSpacing: fmt.sectionLetterSpacing ?? DEFAULT_FORMAT.fonts.sectionLetterSpacing,
+      },
+      colors: {
+        primary: fmt.colors.primary,
+        secondary: fmt.colors.secondary,
+        accent: fmt.colors.accent || fmt.colors.primary,
+        divider: fmt.colors.divider || fmt.colors.primary,
+      },
+      header: {
+        align: fmt.headerAlign,
+        showSubtitle: fmt.showSubtitle ?? !!data.personal.title,
+      },
+      footer: fmt.footer || DEFAULT_FORMAT.footer,
+      pageSize: DEFAULT_FORMAT.pageSize,
+      sectionSpacing: fmt.sectionSpacing ?? DEFAULT_FORMAT.sectionSpacing,
+      entrySpacing: fmt.entrySpacing ?? DEFAULT_FORMAT.entrySpacing,
+      dividerWeight: fmt.dividerWeight ?? DEFAULT_FORMAT.dividerWeight,
+    } : DEFAULT_FORMAT;
+
     const profileJson = JSON.stringify({
       id: crypto.randomUUID(),
       name: data.personal.fullName || "Imported Resume",
       data: data,
-      format: imported.format ? {
-        ...DEFAULT_FORMAT,
-        colors: imported.format.colors,
-        margins: imported.format.margins,
-        fonts: {
-          ...DEFAULT_FORMAT.fonts,
-          nameSize: imported.format.fontSizes.name,
-          sectionSize: imported.format.fontSizes.section,
-          bodySize: imported.format.fontSizes.body,
-        },
-        header: {
-          ...DEFAULT_FORMAT.header,
-          align: imported.format.headerAlign,
-          showSubtitle: !!data.personal.title,
-        },
-      } : DEFAULT_FORMAT,
+      format: formatObj,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
