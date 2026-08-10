@@ -14,17 +14,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ResumeForge — Resume Builder",
-  description: "Build professional resumes with real-time preview, multiple profiles, and PDF export.",
-  keywords: ["resume", "builder", "PDF", "CV", "career"],
+  title: "ResumeForge — Professional Resume Builder",
+  description: "Build professional resumes with real-time preview, PDF/DOCX import with format preservation, multiple profiles, and PDF export.",
+  keywords: ["resume", "builder", "PDF", "CV", "career", "resume builder", "resume forge"],
   authors: [{ name: "ResumeForge" }],
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: "/logo.svg",
   },
   openGraph: {
-    title: "ResumeForge",
-    description: "Professional resume builder with live preview",
-    url: "https://chat.z.ai",
+    title: "ResumeForge — Professional Resume Builder",
+    description: "Build stunning resumes with real-time preview and format-preserving import",
+    url: "https://github.com/Pratham2511/Resumer_builder",
     siteName: "ResumeForge",
     type: "website",
   },

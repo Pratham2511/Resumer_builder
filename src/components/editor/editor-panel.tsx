@@ -36,12 +36,12 @@ export function PersonalInfoEditor() {
     <div className="space-y-3">
       {fields.map((f) => (
         <div key={f.key}>
-          <Label className="text-xs text-muted-foreground mb-1">{f.label}</Label>
+          <Label className="text-xs text-slate-500 mb-1 font-medium">{f.label}</Label>
           <Input
             value={p[f.key as keyof typeof p] as string}
             onChange={(e) => updatePersonal({ [f.key]: e.target.value })}
             placeholder={f.placeholder}
-            className="h-8 text-sm"
+            className="h-8 text-sm border-slate-200 focus-visible:ring-blue-500/30 focus-visible:border-blue-400"
           />
         </div>
       ))}
@@ -49,20 +49,20 @@ export function PersonalInfoEditor() {
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Switch checked={p.showPhoto} onCheckedChange={(v) => updatePersonal({ showPhoto: v })} />
-          <Label className="text-xs">Show photo in resume</Label>
+          <Label className="text-xs text-slate-600">Show photo in resume</Label>
         </div>
         {p.showPhoto && (
           <div className="flex items-center gap-3">
             {p.photoUrl ? (
               <div className="relative">
-                <img src={p.photoUrl} alt="Profile" className="w-16 h-16 rounded-full object-cover border" />
-                <Button variant="ghost" size="icon" className="h-5 w-5 absolute -top-1 -right-1 bg-background border rounded-full" onClick={() => updatePersonal({ photoUrl: "", showPhoto: false })}>
+                <img src={p.photoUrl} alt="Profile" className="w-16 h-16 rounded-full object-cover border-2 border-slate-200" />
+                <Button variant="ghost" size="icon" className="h-5 w-5 absolute -top-1 -right-1 bg-white border border-slate-200 rounded-full shadow-sm" onClick={() => updatePersonal({ photoUrl: "", showPhoto: false })}>
                   <X className="h-3 w-3" />
                 </Button>
               </div>
             ) : (
-              <label className="flex items-center justify-center w-16 h-16 rounded-full border-2 border-dashed border-muted-foreground/30 cursor-pointer hover:border-muted-foreground/60 transition-colors">
-                <Upload className="h-4 w-4 text-muted-foreground" />
+              <label className="flex items-center justify-center w-16 h-16 rounded-full border-2 border-dashed border-slate-300 cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition-colors">
+                <Upload className="h-4 w-4 text-slate-400" />
                 <input type="file" accept="image/*" className="hidden" onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
@@ -75,18 +75,18 @@ export function PersonalInfoEditor() {
                 }} />
               </label>
             )}
-            <span className="text-xs text-muted-foreground">Upload a profile photo (JPG/PNG)</span>
+            <span className="text-xs text-slate-400">Upload a profile photo (JPG/PNG)</span>
           </div>
         )}
       </div>
       <div>
-        <Label className="text-xs text-muted-foreground mb-1">Professional Summary</Label>
+        <Label className="text-xs text-slate-500 mb-1 font-medium">Professional Summary</Label>
         <Textarea
           value={profile.data.summary}
           onChange={(e) => updateSummary(e.target.value)}
           placeholder="Brief professional summary..."
           rows={4}
-          className="text-sm resize-none"
+          className="text-sm resize-none border-slate-200 focus-visible:ring-blue-500/30 focus-visible:border-blue-400"
         />
       </div>
     </div>
@@ -114,28 +114,28 @@ function EntryEditor({ sectionId, entry, type }: { sectionId: string; entry: Sec
   const needsLink = type === "projects";
 
   return (
-    <div className="border border-border rounded-md p-3 space-y-2 bg-card">
+    <div className="border border-slate-200 rounded-xl p-3 space-y-2 bg-white shadow-sm">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-muted-foreground truncate">{entry.title || entry.category || "New Entry"}</span>
-        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeEntry(sectionId, entry.id)}>
-          <Trash2 className="h-3 w-3 text-destructive" />
+        <span className="text-xs font-medium text-slate-500 truncate">{entry.title || entry.category || "New Entry"}</span>
+        <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-red-50" onClick={() => removeEntry(sectionId, entry.id)}>
+          <Trash2 className="h-3 w-3 text-red-400" />
         </Button>
       </div>
 
       {needsCategory && (
         <>
-          <Input value={entry.category} onChange={(e) => up({ category: e.target.value })} placeholder="Category (e.g. Languages)" className="h-7 text-sm" />
-          <Input value={entry.items} onChange={(e) => up({ items: e.target.value })} placeholder="Items (comma-separated: Python, JS, SQL)" className="h-7 text-sm" />
+          <Input value={entry.category} onChange={(e) => up({ category: e.target.value })} placeholder="Category (e.g. Languages)" className="h-7 text-sm border-slate-200 focus-visible:ring-blue-500/30" />
+          <Input value={entry.items} onChange={(e) => up({ items: e.target.value })} placeholder="Items (comma-separated: Python, JS, SQL)" className="h-7 text-sm border-slate-200 focus-visible:ring-blue-500/30" />
         </>
       )}
 
       {needsTitle && (
-        <Input value={entry.title} onChange={(e) => up({ title: e.target.value })} placeholder={type === "languages" ? "Language" : "Title"} className="h-7 text-sm" />
+        <Input value={entry.title} onChange={(e) => up({ title: e.target.value })} placeholder={type === "languages" ? "Language" : "Title"} className="h-7 text-sm border-slate-200 focus-visible:ring-blue-500/30" />
       )}
 
       {needsProficiency && (
         <Select value={entry.proficiency} onValueChange={(v) => up({ proficiency: v })}>
-          <SelectTrigger className="h-7 text-sm"><SelectValue placeholder="Proficiency" /></SelectTrigger>
+          <SelectTrigger className="h-7 text-sm border-slate-200"><SelectValue placeholder="Proficiency" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="Native">Native</SelectItem>
             <SelectItem value="Fluent">Fluent</SelectItem>
@@ -146,31 +146,31 @@ function EntryEditor({ sectionId, entry, type }: { sectionId: string; entry: Sec
         </Select>
       )}
 
-      {needsSubtitle && <Input value={entry.subtitle} onChange={(e) => up({ subtitle: e.target.value })} placeholder="Organization / Institution" className="h-7 text-sm" />}
-      {needsDateRange && <Input value={entry.dateRange} onChange={(e) => up({ dateRange: e.target.value })} placeholder="2020 - 2024" className="h-7 text-sm" />}
-      {needsIssuer && <Input value={entry.issuer} onChange={(e) => up({ issuer: e.target.value })} placeholder="Issuing organization" className="h-7 text-sm" />}
+      {needsSubtitle && <Input value={entry.subtitle} onChange={(e) => up({ subtitle: e.target.value })} placeholder="Organization / Institution" className="h-7 text-sm border-slate-200 focus-visible:ring-blue-500/30" />}
+      {needsDateRange && <Input value={entry.dateRange} onChange={(e) => up({ dateRange: e.target.value })} placeholder="2020 - 2024" className="h-7 text-sm border-slate-200 focus-visible:ring-blue-500/30" />}
+      {needsIssuer && <Input value={entry.issuer} onChange={(e) => up({ issuer: e.target.value })} placeholder="Issuing organization" className="h-7 text-sm border-slate-200 focus-visible:ring-blue-500/30" />}
       {needsLink && (
         <div className="grid grid-cols-2 gap-2">
-          <Input value={entry.linkLabel} onChange={(e) => up({ linkLabel: e.target.value })} placeholder="Link label" className="h-7 text-sm" />
-          <Input value={entry.link} onChange={(e) => up({ link: e.target.value })} placeholder="https://..." className="h-7 text-sm" />
+          <Input value={entry.linkLabel} onChange={(e) => up({ linkLabel: e.target.value })} placeholder="Link label" className="h-7 text-sm border-slate-200 focus-visible:ring-blue-500/30" />
+          <Input value={entry.link} onChange={(e) => up({ link: e.target.value })} placeholder="https://..." className="h-7 text-sm border-slate-200 focus-visible:ring-blue-500/30" />
         </div>
       )}
 
       {needsDescription && (
-        <Textarea value={entry.description} onChange={(e) => up({ description: e.target.value })} placeholder="Description..." rows={2} className="text-sm resize-none" />
+        <Textarea value={entry.description} onChange={(e) => up({ description: e.target.value })} placeholder="Description..." rows={2} className="text-sm resize-none border-slate-200 focus-visible:ring-blue-500/30" />
       )}
 
       {needsBullets && (
         <div className="space-y-1">
           {entry.bullets.map((bullet, i) => (
             <div key={i} className="flex gap-1">
-              <Textarea value={bullet} onChange={(e) => updateBullet(sectionId, entry.id, i, e.target.value)} placeholder={`Bullet ${i + 1}`} rows={2} className="text-sm resize-none flex-1" />
-              <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={() => removeBullet(sectionId, entry.id, i)}>
-                <Trash2 className="h-3 w-3 text-destructive" />
+              <Textarea value={bullet} onChange={(e) => updateBullet(sectionId, entry.id, i, e.target.value)} placeholder={`Bullet ${i + 1}`} rows={2} className="text-sm resize-none flex-1 border-slate-200 focus-visible:ring-blue-500/30" />
+              <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0 hover:bg-red-50" onClick={() => removeBullet(sectionId, entry.id, i)}>
+                <Trash2 className="h-3 w-3 text-red-400" />
               </Button>
             </div>
           ))}
-          <Button variant="outline" size="sm" className="h-6 text-xs w-full" onClick={() => addBullet(sectionId, entry.id)}>
+          <Button variant="outline" size="sm" className="h-6 text-xs w-full border-dashed border-slate-300 text-slate-500 hover:bg-blue-50/30 hover:text-blue-600 hover:border-blue-300" onClick={() => addBullet(sectionId, entry.id)}>
             <Plus className="h-3 w-3 mr-1" /> Add Bullet
           </Button>
         </div>
@@ -189,24 +189,24 @@ function SectionEditor({ section, index, total }: { section: ResumeSection; inde
   const moveEntry = useResumeStore((s) => s.moveEntry);
 
   return (
-    <div className="border border-border rounded-lg overflow-hidden">
-      <div className="flex items-center gap-1 p-2 bg-muted/50">
-        <Button variant="ghost" size="icon" className="h-6 w-6" disabled={index === 0} onClick={() => moveSection(section.id, "up")}>
+    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+      <div className="flex items-center gap-1 p-2 bg-slate-50/80 border-b border-slate-100">
+        <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400" disabled={index === 0} onClick={() => moveSection(section.id, "up")}>
           <ChevronUp className="h-3 w-3" />
         </Button>
-        <Button variant="ghost" size="icon" className="h-6 w-6" disabled={index === total - 1} onClick={() => moveSection(section.id, "down")}>
+        <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400" disabled={index === total - 1} onClick={() => moveSection(section.id, "down")}>
           <ChevronDown className="h-3 w-3" />
         </Button>
         <Input
           value={section.title}
           onChange={(e) => updateSectionTitle(section.id, e.target.value)}
-          className="h-6 text-sm font-semibold flex-1 border-none bg-transparent focus-visible:ring-1"
+          className="h-6 text-sm font-semibold flex-1 border-none bg-transparent focus-visible:ring-1 focus-visible:ring-blue-500/30"
         />
-        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => toggleSectionVisibility(section.id)}>
+        <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-blue-500" onClick={() => toggleSectionVisibility(section.id)}>
           {section.visible ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
         </Button>
-        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeSection(section.id)}>
-          <Trash2 className="h-3 w-3 text-destructive" />
+        <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:bg-red-50 hover:text-red-500" onClick={() => removeSection(section.id)}>
+          <Trash2 className="h-3 w-3" />
         </Button>
       </div>
 
@@ -216,10 +216,10 @@ function SectionEditor({ section, index, total }: { section: ResumeSection; inde
             <div key={entry.id} className="relative">
               {section.entries.length > 1 && (
                 <div className="absolute -left-1 top-1 flex flex-col gap-0.5">
-                  <Button variant="ghost" size="icon" className="h-4 w-4" disabled={ei === 0} onClick={() => moveEntry(section.id, entry.id, "up")}>
+                  <Button variant="ghost" size="icon" className="h-4 w-4 text-slate-300" disabled={ei === 0} onClick={() => moveEntry(section.id, entry.id, "up")}>
                     <ChevronUp className="h-2 w-2" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-4 w-4" disabled={ei === section.entries.length - 1} onClick={() => moveEntry(section.id, entry.id, "down")}>
+                  <Button variant="ghost" size="icon" className="h-4 w-4 text-slate-300" disabled={ei === section.entries.length - 1} onClick={() => moveEntry(section.id, entry.id, "down")}>
                     <ChevronDown className="h-2 w-2" />
                   </Button>
                 </div>
@@ -227,7 +227,7 @@ function SectionEditor({ section, index, total }: { section: ResumeSection; inde
               <EntryEditor sectionId={section.id} entry={entry} type={section.type} />
             </div>
           ))}
-          <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => addEntry(section.id)}>
+          <Button variant="outline" size="sm" className="w-full text-xs border-dashed border-slate-300 text-slate-500 hover:bg-blue-50/30 hover:text-blue-600 hover:border-blue-300" onClick={() => addEntry(section.id)}>
             <Plus className="h-3 w-3 mr-1" /> Add Entry
           </Button>
         </div>
@@ -251,16 +251,16 @@ export function AddSectionEditor() {
   return (
     <div>
       {open ? (
-        <div className="space-y-1 p-2 border border-dashed border-border rounded-lg">
+        <div className="space-y-1 p-2 border border-dashed border-slate-300 rounded-xl bg-slate-50/50">
           {available.map((type) => (
-            <Button key={type} variant="ghost" size="sm" className="w-full justify-start text-xs h-7" onClick={() => { addSection(type); setOpen(false); }}>
+            <Button key={type} variant="ghost" size="sm" className="w-full justify-start text-xs h-7 hover:bg-blue-50/30 hover:text-blue-600" onClick={() => { addSection(type); setOpen(false); }}>
               <Plus className="h-3 w-3 mr-2" /> {SECTION_LABELS[type]}
             </Button>
           ))}
-          <Button variant="ghost" size="sm" className="w-full text-xs h-7 text-muted-foreground" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button variant="ghost" size="sm" className="w-full text-xs h-7 text-slate-400" onClick={() => setOpen(false)}>Cancel</Button>
         </div>
       ) : (
-        <Button variant="outline" size="sm" className="w-full text-xs border-dashed" onClick={() => setOpen(true)}>
+        <Button variant="outline" size="sm" className="w-full text-xs border-dashed border-slate-300 text-slate-500 hover:bg-blue-50/30 hover:text-blue-600 hover:border-blue-300" onClick={() => setOpen(true)}>
           <Plus className="h-3 w-3 mr-1" /> Add Section
         </Button>
       )}

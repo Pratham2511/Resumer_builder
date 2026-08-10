@@ -62,7 +62,7 @@ export function ProfileManager() {
     <div className="space-y-2">
       <div className="flex items-center gap-2">
         <Select value={activeProfileId || ""} onValueChange={switchProfile}>
-          <SelectTrigger className="h-8 text-sm flex-1">
+          <SelectTrigger className="h-8 text-sm flex-1 border-slate-200">
             <SelectValue placeholder="Select profile" />
           </SelectTrigger>
           <SelectContent>
@@ -74,14 +74,14 @@ export function ProfileManager() {
 
         <Dialog open={showNew} onOpenChange={setShowNew}>
           <DialogTrigger asChild>
-            <Button variant="outline" size="icon" className="h-8 w-8"><Plus className="h-3 w-3" /></Button>
+            <Button variant="outline" size="icon" className="h-8 w-8 border-slate-200 hover:bg-blue-50/30 hover:text-blue-600"><Plus className="h-3 w-3" /></Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-sm">
             <DialogHeader><DialogTitle>New Profile</DialogTitle></DialogHeader>
-            <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Profile name (e.g. Google Resume)" onKeyDown={(e) => e.key === "Enter" && handleCreate()} />
+            <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Profile name (e.g. Google Resume)" onKeyDown={(e) => e.key === "Enter" && handleCreate()} className="border-slate-200 focus-visible:ring-blue-500/30" />
             <DialogFooter>
               <DialogClose asChild><Button variant="outline" size="sm">Cancel</Button></DialogClose>
-              <Button size="sm" onClick={handleCreate}>Create</Button>
+              <Button size="sm" onClick={handleCreate} className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-0">Create</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -89,26 +89,26 @@ export function ProfileManager() {
 
       {active && (
         <div className="flex items-center gap-1">
-          <Input value={active.name} onChange={(e) => renameProfile(active.id, e.target.value)} className="h-6 text-xs flex-1" />
+          <Input value={active.name} onChange={(e) => renameProfile(active.id, e.target.value)} className="h-6 text-xs flex-1 border-slate-200 focus-visible:ring-blue-500/30" />
 
           <Dialog open={showDup} onOpenChange={setShowDup}>
             <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6" title="Duplicate"><Copy className="h-3 w-3" /></Button>
+              <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-blue-500" title="Duplicate"><Copy className="h-3 w-3" /></Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-sm">
               <DialogHeader><DialogTitle>Duplicate Profile</DialogTitle></DialogHeader>
-              <Input value={dupName} onChange={(e) => setDupName(e.target.value)} placeholder="New profile name" onKeyDown={(e) => e.key === "Enter" && handleDuplicate()} />
+              <Input value={dupName} onChange={(e) => setDupName(e.target.value)} placeholder="New profile name" onKeyDown={(e) => e.key === "Enter" && handleDuplicate()} className="border-slate-200 focus-visible:ring-blue-500/30" />
               <DialogFooter>
-                <Button size="sm" onClick={handleDuplicate}>Duplicate</Button>
+                <Button size="sm" onClick={handleDuplicate} className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-0">Duplicate</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
 
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleExport} title="Export JSON"><Download className="h-3 w-3" /></Button>
+          <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-blue-500" onClick={handleExport} title="Export JSON"><Download className="h-3 w-3" /></Button>
 
           <ImportModal />
 
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleDelete(active.id)} title="Delete"><Trash2 className="h-3 w-3 text-destructive" /></Button>
+          <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:bg-red-50 hover:text-red-500" onClick={() => handleDelete(active.id)} title="Delete"><Trash2 className="h-3 w-3" /></Button>
         </div>
       )}
     </div>

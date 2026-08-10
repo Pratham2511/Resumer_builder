@@ -8,8 +8,11 @@ interface TextItem {
   fontSize: number;
   fontName: string;
   fontFamily: string;  // from styles — the actual CSS font family
+  fontWeight: number;  // font weight (100-900)
   color: string;
   isBold: boolean;
+  isItalic: boolean;
+  isUnderline: boolean;
   width: number;
 }
 
@@ -24,7 +27,15 @@ function rgbToHex(r: number, g: number, b: number): string {
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
-// Extract colors from operator list by correlating setFillRGBColor with subsequent text
+// Convert CMYK to RGB (used when PDFs use CMYK color space)
+function cmykToRgb(c: number, m: number, y: number, k: number): [number, number, number] {
+  const r = (1 - c) * (1 - k);
+  const g = (1 - m) * (1 - k);
+  const b = (1 - y) * (1 - k);
+  return [r, g, b];
+}
+
+// Extract colors from operator list by correlating color operations with subsequent text
 function extractColorsFromOps(ops: any, pdfjsOps: any): Map<string, string> {
   const fontColorMap = new Map<string, string>();
   let currentColor: [number, number, number] = [0, 0, 0];
@@ -34,11 +45,10 @@ function extractColorsFromOps(ops: any, pdfjsOps: any): Map<string, string> {
     const fn = ops.fnArray[i];
     const args = ops.argsArray[i];
 
-    // Track fill color
+    // Track fill color — handle RGB, CMYK, and other color spaces
     if (fn === pdfjsOps.setFillRGBColor) {
       let [r, g, b] = args;
       const maxVal = Math.max(r, g, b);
-
       if (maxVal <= 1) {
         currentColor = [r, g, b];
       } else if (maxVal <= 255) {
@@ -46,12 +56,18 @@ function extractColorsFromOps(ops: any, pdfjsOps: any): Map<string, string> {
       } else {
         currentColor = [r / 65535, g / 65535, b / 65535];
       }
+    } else if (fn === pdfjsOps.setFillCMYKColor) {
+      // CMYK color space — convert to RGB
+      let [c, m, y, k] = args;
+      currentColor = cmykToRgb(c, m, y, k);
     }
+    // Note: We intentionally skip setFillColorSpace and setFillColor
+    // as they use lab/icalab color functions which html2pdf.js can't handle.
+    // Default to current RGB color for those.
 
     // Track font being set
     if (fn === pdfjsOps.setFont) {
       currentFont = args[0] || "";
-      // Map font → color (update every time to catch color changes for same font)
       const hex = rgbToHex(currentColor[0], currentColor[1], currentColor[2]);
       fontColorMap.set(currentFont, hex);
     }
@@ -87,27 +103,38 @@ function detectDividersFromOps(ops: any, pdfjsOps: any, pageHeight: number): { w
 }
 
 // ─── Histogram-based margin detection ───
-// Instead of min/max (which outliers distort), use the most common left edge
 function detectMarginFromPositions(positions: number[], tolerance: number = 3): number {
   if (positions.length === 0) return 56;
-  // Build a frequency histogram
   const freq: Record<number, number> = {};
   for (const pos of positions) {
     const rounded = Math.round(pos / tolerance) * tolerance;
     freq[rounded] = (freq[rounded] || 0) + 1;
   }
-  // Find the most common position (the margin)
   const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
   return parseFloat(sorted[0][0]);
 }
 
 // Detect page size (A4 vs Letter)
 function detectPageSize(width: number, height: number): "a4" | "letter" {
-  // A4: 595.28 x 841.89 pt
-  // Letter: 612 x 792 pt
   const a4Diff = Math.abs(width - 595.28) + Math.abs(height - 841.89);
   const letterDiff = Math.abs(width - 612) + Math.abs(height - 792);
   return a4Diff < letterDiff ? "a4" : "letter";
+}
+
+// Estimate font weight from font name heuristics
+function estimateFontWeight(fontName: string, styleWeight: number | undefined): number {
+  if (styleWeight && styleWeight >= 100 && styleWeight <= 900) return styleWeight;
+  const lower = fontName.toLowerCase();
+  if (/thin|hairline/i.test(lower)) return 100;
+  if (/extralight|ultralight/i.test(lower)) return 200;
+  if (/light/i.test(lower)) return 300;
+  if (/regular|normal|book/i.test(lower)) return 400;
+  if (/medium/i.test(lower)) return 500;
+  if (/semibold|demibold|demi/i.test(lower)) return 600;
+  if (/extrabold|ultrabold/i.test(lower)) return 800;
+  if (/black|heavy|ultra/i.test(lower)) return 900;
+  if (/bold/i.test(lower)) return 700;
+  return 400;
 }
 
 export async function POST(req: NextRequest) {
@@ -171,9 +198,16 @@ export async function POST(req: NextRequest) {
         const styleInfo = styles[fontName] || {};
         const fontFamily = styleInfo.fontFamily || "";
 
-        // Detect bold from font name + style
-        const isBold = /bold|black|heavy|demibold|semibold/i.test(fontName) ||
-                       (styleInfo.fontWeight && Number(styleInfo.fontWeight) >= 600);
+        // Detect bold from font name + style weight
+        const fontWeight = estimateFontWeight(fontName, styleInfo.fontWeight ? Number(styleInfo.fontWeight) : undefined);
+        const isBold = fontWeight >= 600 || /bold|black|heavy|demibold|semibold/i.test(fontName);
+
+        // Detect italic from font name + style
+        const isItalic = /italic|oblique|slant/i.test(fontName) || styleInfo.fontStyle === "italic";
+
+        // Detect underline — PDF doesn't store this in text items typically,
+        // but some style objects include it
+        const isUnderline = styleInfo.textDecoration === "underline" || false;
 
         // Get color from operator list mapping
         let color = fontColorMap.get(fontName) || "#000000";
@@ -193,8 +227,11 @@ export async function POST(req: NextRequest) {
           fontSize: Math.round(fontSize * 10) / 10,
           fontName,
           fontFamily,
+          fontWeight,
           color,
           isBold,
+          isItalic,
+          isUnderline,
           width,
         });
       }
@@ -263,7 +300,6 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. FONT SIZES — improved role classification using position + style
-    // Build frequency map of all font sizes
     const sizeFreq: Record<number, number> = {};
     for (const item of allItems) {
       const rounded = Math.round(item.fontSize * 2) / 2;
@@ -274,17 +310,13 @@ export async function POST(req: NextRequest) {
       .sort((a, b) => b.freq - a.freq);
 
     // Name size = largest font in the top 30% of the first page
-    // PDF Y goes from bottom (0) to top (height), so top 30% = y > pageHeight * 0.7
     const topRegionItems = firstPageItems.filter(item => item.y > pageHeight * 0.7);
     const nameSizeCandidates = topRegionItems
       .map(item => item.fontSize)
       .sort((a, b) => b - a);
-    // The name is typically the largest text item in the top region
     const nameSize = nameSizeCandidates[0] || sortedSizes[0]?.size || 26;
 
     // Section header size — improved detection:
-    // Look for bold text that is ALL CAPS or short headings, smaller than name
-    // Also consider items that are the start of new "blocks" (significant Y gap from previous)
     const sectionSizeCandidates: number[] = [];
 
     // Method A: Bold + ALL CAPS + reasonable length
@@ -296,13 +328,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Method B: Bold text that appears right before a group of smaller text (section header pattern)
-    // We detect this by looking at consecutive items in Y order
+    // Method B: Bold text that appears right before a group of smaller text
     const sortedByY = [...firstPageItems].sort((a, b) => b.y - a.y);
     for (let i = 0; i < sortedByY.length - 3; i++) {
       const item = sortedByY[i];
       const nextItems = sortedByY.slice(i + 1, i + 4);
-      // If this bold item is followed by smaller non-bold items → likely a section header
       if (item.isBold && item.fontSize < nameSize && item.fontSize > 7) {
         const isFollowedBySmaller = nextItems.some(n =>
           !n.isBold && n.fontSize < item.fontSize && Math.abs(n.y - item.y) < item.fontSize * 4
@@ -313,18 +343,31 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Method C: Text with font weight >= 700 and larger than median body size
+    // This catches section headers that aren't ALL CAPS
+    const boldItems = allItems.filter(item => item.fontWeight >= 700 && item.fontSize < nameSize && item.fontSize > 8);
+    if (boldItems.length > 0 && sectionSizeCandidates.length === 0) {
+      // Use the most common bold font size as section size
+      const boldSizeFreq: Record<number, number> = {};
+      for (const item of boldItems) {
+        const rounded = Math.round(item.fontSize);
+        boldSizeFreq[rounded] = (boldSizeFreq[rounded] || 0) + 1;
+      }
+      const topBoldSize = Object.entries(boldSizeFreq).sort((a, b) => b[1] - a[1])[0];
+      if (topBoldSize) sectionSizeCandidates.push(parseFloat(topBoldSize[0]));
+    }
+
     const sectionSize = sectionSizeCandidates.length > 0
       ? modeOf(sectionSizeCandidates)
       : (sortedSizes.find(s => s.size < nameSize && s.size >= 10)?.size || 12);
 
     // Body size = most common font size that's smaller than section size
-    // Use character-length weighted frequency for accuracy
     const bodySizeCandidates = sortedSizes.filter(s => s.size < sectionSize && s.size >= 7);
     const bodySize = bodySizeCandidates.length > 0
-      ? bodySizeCandidates[0].size  // most frequent (already sorted by freq)
+      ? bodySizeCandidates[0].size
       : 9.5;
 
-    // Meta/contact size — typically same as body or slightly smaller, used for contact info
+    // Meta/contact size — typically same as body or slightly smaller
     const metaSizeCandidates = sortedSizes.filter(s => s.size <= bodySize + 0.5 && s.size >= 7);
     const metaSize = metaSizeCandidates.length > 0
       ? metaSizeCandidates[0].size
@@ -338,12 +381,12 @@ export async function POST(req: NextRequest) {
       ? modeOf(entryTitleCandidates)
       : Math.round(((bodySize + sectionSize) / 2) * 10) / 10;
 
-    // 3. COLORS — improved with per-item tracking
+    // 3. COLORS — improved with per-item tracking, skip near-black variants
     const colorFreq: Record<string, number> = {};
     for (const item of allItems) {
       const c = item.color.toLowerCase();
-      if (c === "#000000" || c === "#000" || c === "#010000" || c === "#000100" || c === "#010001") continue;
-      // Weight: name-sized text × 5, bold × 3, heading × 2, body × 1
+      // Skip near-black colors (within threshold of pure black)
+      if (isNearBlack(c)) continue;
       let weight = item.str.length;
       if (item.fontSize >= nameSize - 1) weight *= 5;
       else if (item.isBold) weight *= 3;
@@ -359,24 +402,19 @@ export async function POST(req: NextRequest) {
     const accentColor = sortedColors.find(c => c !== primaryColor) || primaryColor;
 
     // 4. MARGINS — improved histogram-based detection
-    // Only use substantial content items (length > 1, width > 5) from first page
     const contentItems = firstPageItems.filter(item => item.str.length > 1 && item.width > 5);
 
-    // Left margin: most common x position of content starts
     const leftPositions = contentItems.map(item => item.x);
     const leftMarginRaw = detectMarginFromPositions(leftPositions);
 
-    // Right margin: most common right edge, then subtract from page width
     const rightPositions = contentItems.map(item => item.x + item.width);
     const rightEdgeRaw = detectMarginFromPositions(rightPositions);
     const rightMarginRaw = Math.max(0, pageWidth - rightEdgeRaw);
 
-    // Top margin: highest y position (PDF y goes up)
     const topPositions = contentItems.map(item => item.y);
     const topEdgeRaw = detectMarginFromPositions(topPositions);
     const topMarginRaw = Math.max(0, pageHeight - topEdgeRaw);
 
-    // Bottom margin: lowest y position
     const bottomPositions = contentItems.map(item => item.y);
     const bottomEdgeRaw = contentItems.length > 0 ? Math.min(...bottomPositions) : 72;
     const bottomMarginRaw = Math.max(0, bottomEdgeRaw);
@@ -388,14 +426,13 @@ export async function POST(req: NextRequest) {
       left: clampMargin(leftMarginRaw),
     };
 
-    // Symmetry adjustments — resumes typically have similar left/right and top/bottom
+    // Symmetry adjustments
     if (margins.right > margins.left * 2.5) margins.right = margins.left;
     if (margins.left > margins.right * 2.5) margins.left = margins.right;
     if (margins.bottom > margins.top * 2) margins.bottom = margins.top;
     if (margins.top > margins.bottom * 2) margins.top = margins.bottom;
 
     // 5. HEADER ALIGNMENT — improved detection
-    // Check all items in the name-sized range for center vs left alignment
     const nameItems = firstPageItems.filter(item => item.fontSize >= nameSize - 1);
     let headerAlign: "center" | "left" = "left";
     if (nameItems.length > 0) {
@@ -404,7 +441,6 @@ export async function POST(req: NextRequest) {
       const offset = Math.abs(nameCenterX - pageCenter);
       headerAlign = offset < pageWidth * 0.08 ? "center" : "left";
     }
-    // Also check contact info (meta-sized items near the top) for alignment
     const headerMetaItems = firstPageItems.filter(item =>
       item.fontSize <= metaSize + 1 && item.y > pageHeight * 0.6
     );
@@ -412,7 +448,6 @@ export async function POST(req: NextRequest) {
       const metaCenterX = headerMetaItems.reduce((sum, item) => sum + item.x + item.width / 2, 0) / headerMetaItems.length;
       const pageCenter = pageWidth / 2;
       const metaOffset = Math.abs(metaCenterX - pageCenter);
-      // If meta items are centered, override to center
       if (metaOffset < pageWidth * 0.08 && headerAlign === "left") {
         headerAlign = "center";
       }
@@ -443,20 +478,17 @@ export async function POST(req: NextRequest) {
     // 8. SECTION/ENTRY SPACING — detect from Y gaps between sections
     let sectionSpacing = 8;
     let entrySpacing = 8;
-    // Look for Y gaps larger than line height but smaller than section breaks
     if (firstPageItems.length > 5) {
       const sortedFirst = [...firstPageItems].sort((a, b) => b.y - a.y);
       const gaps: number[] = [];
       for (let i = 1; i < sortedFirst.length; i++) {
         const gap = Math.abs(sortedFirst[i - 1].y - sortedFirst[i].y);
-        // Gaps between line-height × 2 and line-height × 6 are section/entry spacing
         if (gap > bodySize * lineHeight * 1.5 && gap < bodySize * lineHeight * 6) {
           gaps.push(gap);
         }
       }
       if (gaps.length > 2) {
         const avgGap = modeOf(gaps, 1);
-        // Convert to pt (approximate)
         sectionSpacing = Math.round(avgGap * 0.6);
         entrySpacing = Math.round(avgGap * 0.4);
         sectionSpacing = Math.max(4, Math.min(20, sectionSpacing));
@@ -474,14 +506,11 @@ export async function POST(req: NextRequest) {
 
     // 10. FOOTER DETECTION — improved with multi-page analysis
     const lastPageItems = pages[numPages - 1]?.items || [];
-    // Footer region = bottom 15% of the page (PDF y < 15% of height)
     const footerItems = lastPageItems.filter(item => item.y < pageHeight * 0.15);
     const hasPageNumbers = footerItems.some(item => /^\d+$/.test(item.str.trim()) && item.str.trim().length <= 2);
-    // Check for name-like text in footer (text smaller than body, at very bottom)
     const hasNameInFooter = footerItems.some(item =>
       item.fontSize <= metaSize + 1 && item.str.length > 3 && !/^\d+$/.test(item.str.trim())
     );
-    // Extract custom footer text (e.g., "Page 1 of 2", "References available")
     let customFooterText = "";
     const footerTextParts = footerItems
       .filter(item => item.str.trim().length > 2 && !/^\d+$/.test(item.str.trim()))
@@ -491,7 +520,6 @@ export async function POST(req: NextRequest) {
     }
 
     // 11. SUBTITLE DETECTION — improved
-    // Subtitle = text near the name that's smaller than name but larger than body
     const showSubtitle = firstPageItems.some(item => {
       const nearName = nameItems.length > 0
         ? Math.abs(item.y - nameItems[0].y) < nameSize * 2.5
@@ -501,6 +529,17 @@ export async function POST(req: NextRequest) {
              item.fontSize > bodySize + 1 &&
              !item.isBold;
     });
+
+    // 12. FONT STYLE ANALYSIS — detect dominant font styles for better format preservation
+    // Count italic usage to determine if it's a significant style in the resume
+    const italicCount = allItems.filter(item => item.isItalic).length;
+    const totalItems = allItems.length;
+    const significantItalicRatio = totalItems > 0 ? italicCount / totalItems : 0;
+
+    // Detect if the resume uses mixed bold/normal for entries vs section headers
+    // This helps preserve the visual hierarchy correctly
+    const boldBodyItems = allItems.filter(item => item.isBold && Math.abs(item.fontSize - bodySize) < 2);
+    const hasBoldBodyText = boldBodyItems.length > totalItems * 0.05;
 
     // Parse resume structure
     const resumeData = parseResumeText(text);
@@ -539,7 +578,13 @@ export async function POST(req: NextRequest) {
       format: detectedFormat,
       rawText: text,
       pageCount: numPages,
-      pageSize,  // pass detected page size
+      pageSize,
+      // Include font style metadata for client-side format preservation
+      fontStyleMeta: {
+        hasSignificantItalic: significantItalicRatio > 0.05,
+        hasBoldBodyText,
+        dominantFontWeight: Math.round(allItems.reduce((sum, item) => sum + item.fontWeight, 0) / Math.max(totalItems, 1)),
+      },
     });
   } catch (error: unknown) {
     console.error("PDF import error:", error);
@@ -564,13 +609,17 @@ function modeOf(values: number[], tolerance: number = 0.5): number {
   return parseFloat(Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0]);
 }
 
-function isDarkerColor(hex: string): boolean {
+// Check if a hex color is "near black" (within perceptual threshold of #000000)
+function isNearBlack(hex: string): boolean {
+  // Standard near-black colors to skip
+  const nearBlacks = new Set(["#000000", "#000", "#010000", "#000100", "#010001", "#000001", "#000010"]);
+  if (nearBlacks.has(hex)) return true;
   try {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    return luminance < 0.5;
+    // If all channels are below 30, it's near-black
+    return r < 30 && g < 30 && b < 30;
   } catch {
     return true;
   }
