@@ -1,40 +1,41 @@
 # ResumeForge — Professional Resume Builder
 
-A modern, full-featured resume builder with real-time preview, PDF/DOCX import, format preservation, and PDF export. Built with Next.js 16, TypeScript, Tailwind CSS, and Zustand.
+A modern, full-featured resume builder with **real-time preview**, **PDF/DOCX import with format preservation**, **multiple profiles**, and **PDF export**. Built with Next.js 16, React 19, TypeScript, and Tailwind CSS 4.
 
-## Features
+![ResumeForge](https://img.shields.io/badge/Next.js-16-black?style=flat-square) ![React](https://img.shields.io/badge/React-19-blue?style=flat-square) ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square) ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat-square)
 
-- **Live A4/Letter Preview** — See your resume update in real-time as you edit
-- **PDF & DOCX Import** — Upload existing resumes and preserve the original formatting (fonts, margins, colors, layout)
-- **Format Preservation** — Imported resumes maintain their carbon copy design: font family, font sizes, margins, colors, header/footer alignment, line height, and more
-- **Smart Section Detection** — Automatically detects Experience, Education, Skills, Projects, Certifications, and more
-- **Photo Auto-Detection** — Detects if the source resume has a photo placeholder and enables the photo option automatically
-- **Multiple Profiles** — Create and switch between multiple resume versions
-- **PDF Export** — Download your resume as a high-quality PDF
-- **JSON Export/Import** — Share and backup resume data as JSON
-- **Format Controls** — Fine-tune margins, fonts, colors, spacing, and layout
-- **Zoom Control** — Adjust preview zoom level for comfortable editing
-- **Drag & Drop Reorder** — Reorder sections and entries with drag and drop
+## ✨ Features
 
-## Tech Stack
+- **WYSIWYG Editor** — Edit resume content with live A4/Letter preview
+- **Format-Preserving PDF Import** — Import PDFs and preserve fonts, sizes, colors, margins, spacing, alignment, dividers, and page size
+- **Format-Preserving DOCX Import** — Import Word documents with full style extraction (fonts, colors, margins, bold/italic, alignment)
+- **JSON Import/Export** — Share and backup profiles as JSON
+- **PDF Export** — Generate high-quality PDFs via html2pdf.js
+- **Multiple Profiles** — Create, switch, rename, duplicate, and delete resume profiles
+- **Fine-Grained Format Controls** — Adjust every aspect: margins, font sizes, line height, letter spacing, colors, header alignment, footer, and more
+- **13 Section Types** — Experience, Education, Skills, Projects, Certifications, Languages, Achievements, Publications, Volunteer, Interests, References, Custom
+- **Photo Support** — Upload and display profile photos
+- **Auto-Detection** — Smart section detection, personal info extraction, and format analysis from imported documents
+
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | Next.js 16 (App Router, Turbopack) |
-| Language | TypeScript |
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript 5 |
 | Styling | Tailwind CSS 4 + shadcn/ui |
-| State | Zustand (with localStorage persistence) |
-| PDF Parsing | pdfjs-dist |
+| State | Zustand 5 with localStorage persistence |
+| PDF Parsing | pdfjs-dist 3.11 |
 | DOCX Parsing | jszip + mammoth (fallback) |
 | PDF Export | html2pdf.js |
-| UI Components | Radix UI primitives |
+| UI Components | 47+ shadcn/ui components (Radix primitives) |
 | Icons | Lucide React |
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- **Node.js** 18+ or **Bun** 1.0+
+- **Node.js** 18+ or **Bun** runtime
 - **npm** or **bun** package manager
 
 ### Installation
@@ -46,7 +47,7 @@ cd Resumer_builder
 
 # Install dependencies
 npm install
-# or
+# or with bun
 bun install
 ```
 
@@ -59,7 +60,7 @@ npm run dev
 bun run dev
 ```
 
-The app will be available at [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Production Build
 
@@ -69,96 +70,115 @@ npm run build
 
 # Start production server
 npm run start
+# or
+bun run start
 ```
 
-## How to Use
+The production build uses Next.js standalone output for optimized deployment.
+
+## 📖 How to Use
 
 ### Creating a Resume
 
-1. The app starts with a default "My Resume" profile
-2. Fill in your **Personal Information** in the Content tab (name, email, phone, LinkedIn, etc.)
-3. Add your **Summary** and **Sections** (Experience, Education, Skills, etc.)
-4. Fine-tune the **Format** in the Format tab (margins, fonts, colors, layout)
-5. Click **Download PDF** to export
+1. On first launch, a default "My Resume" profile is created
+2. Use the **Content** tab to fill in personal information and professional summary
+3. Use the **Sections** tab to add and edit resume sections (Experience, Education, Skills, etc.)
+4. Use the **Format** tab to customize layout, fonts, colors, and spacing
+5. Click **Download PDF** to export your resume
 
 ### Importing a Resume
 
-1. Click the **Import** button (upload icon) in the profile bar
-2. Choose **PDF** or **DOCX** tab
-3. Upload your existing resume file
-4. The app will:
+1. Click the **Upload** icon (⬆) in the profile manager bar
+2. Choose **PDF**, **DOCX**, or **JSON** tab
+3. Upload your file — the app will:
    - Extract all text content and detect sections
-   - Preserve the original formatting (fonts, margins, colors, layout)
-   - Auto-detect if the source has a photo placeholder
+   - Preserve the original formatting (fonts, sizes, colors, margins, spacing)
    - Create a new profile with the imported data
-5. Edit the imported resume as needed
+4. Fine-tune the imported resume using the editor
 
 ### Managing Profiles
 
-- **Create** — Click the + button to add a new profile
+- **Create** — Click the + button to create a new profile
 - **Switch** — Use the dropdown to switch between profiles
 - **Rename** — Edit the profile name inline
-- **Duplicate** — Copy an existing profile
-- **Export JSON** — Download profile data as JSON for backup
-- **Delete** — Remove a profile (at least one must remain)
+- **Duplicate** — Click the copy icon to clone a profile
+- **Export** — Click the download icon to save as JSON
+- **Delete** — Click the trash icon (at least one profile must exist)
 
-## Format Controls
-
-The Format tab provides fine-grained control over:
+### Format Controls
 
 | Control | Description |
 |---------|-------------|
-| Page Size | A4 or Letter |
-| Margins | Top, right, bottom, left (in points) |
-| Font Sizes | Name, section header, entry title, body, meta |
-| Line Height | Line spacing multiplier |
-| Colors | Primary, secondary, divider |
-| Header | Alignment (left/center), show subtitle |
-| Footer | Show page numbers, show name, custom text |
-| Spacing | Section gap, entry gap, divider weight |
+| Page Size | A4 (210×297mm) or Letter (216×279mm) |
+| Margins | Top, right, bottom, left in points |
+| Font Sizes | Name, section, entry title, body, meta — in points |
+| Line Height | Body text line height ratio (1.0–2.0) |
+| Section/Entry Gap | Spacing between sections and entries |
+| Divider | Weight of section divider lines |
+| Colors | Primary, secondary, divider — hex color pickers |
+| Header | Alignment (center/left), show subtitle toggle |
+| Footer | Show name, page numbers, custom text |
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 src/
 ├── app/
-│   ├── api/
-│   │   ├── import-pdf/route.ts    # PDF import API endpoint
-│   │   └── import-docx/route.ts   # DOCX import API endpoint
-│   ├── layout.tsx
-│   └── page.tsx                   # Main application page
+│   ├── globals.css          # Tailwind CSS + theme variables
+│   ├── layout.tsx           # Root layout (Geist fonts, Toaster)
+│   ├── page.tsx             # Main page (editor + preview split layout)
+│   └── api/
+│       ├── route.ts         # Health check endpoint
+│       ├── import-pdf/      # PDF import with format extraction
+│       └── import-docx/     # DOCX import with style extraction
 ├── components/
 │   ├── editor/
-│   │   ├── editor-panel.tsx       # Content & sections editor
-│   │   ├── format-controls.tsx    # Format/layout controls
-│   │   ├── import-modal.tsx       # Import PDF/DOCX/JSON modal
-│   │   └── profile-manager.tsx    # Profile switcher & management
+│   │   ├── editor-panel.tsx     # Personal info, entry, section editors
+│   │   ├── format-controls.tsx  # Format/layout control panel
+│   │   ├── import-modal.tsx     # PDF/DOCX/JSON import dialog
+│   │   └── profile-manager.tsx  # Profile CRUD + import/export
 │   ├── preview/
-│   │   └── resume-preview.tsx     # Live A4/Letter resume preview
-│   └── ui/                        # shadcn/ui components
-├── lib/
-│   ├── resume-types.ts            # Type definitions & defaults
-│   ├── resume-store.ts            # Zustand state store
-│   └── parsers/
-│       └── resume-parser.ts       # Resume text parser & format detection
-└── hooks/                         # Custom React hooks
+│   │   └── resume-preview.tsx   # A4/Letter resume renderer
+│   └── ui/                  # 47 shadcn/ui components
+├── hooks/
+│   ├── use-mobile.ts        # Mobile breakpoint hook
+│   └── use-toast.ts         # Toast notification hook
+└── lib/
+    ├── utils.ts             # cn() utility (clsx + tailwind-merge)
+    ├── resume-types.ts      # All TypeScript types + defaults
+    ├── resume-store.ts      # Zustand store with localStorage persist
+    └── parsers/
+        └── resume-parser.ts # Smart text parser + format detection
 ```
 
-## Import Format Preservation
+## 🔧 Format Preservation Details
 
-When importing a PDF or DOCX, the app extracts and preserves:
+### PDF Import
 
-- **Font Family** — Dominant font from the source document (mapped to CSS-safe names)
-- **Font Sizes** — Name, section headers, entry titles, body text, meta/contact info
-- **Margins** — Actual page margins (histogram-based detection for PDFs, section properties for DOCX)
-- **Colors** — Primary, secondary, accent colors (weighted by importance)
-- **Header Alignment** — Left or center (detected from name/contact position)
-- **Line Height** — Inter-line spacing ratio
-- **Page Size** — A4 or Letter (detected from page dimensions)
-- **Dividers** — Horizontal rule thickness between sections
-- **Footer** — Page numbers and custom footer text
-- **Photo** — Auto-detected from embedded images
+The PDF parser uses `pdfjs-dist` to extract:
+- **Font family** — weighted by character count, normalized to CSS-safe names (30+ font mappings)
+- **Font sizes** — name (largest in header), section (bold+ALL CAPS), body (most common), meta, entry title
+- **Font styles** — bold (weight ≥ 600), italic, underline detection
+- **Colors** — per-text-item from operator list (RGB + CMYK color spaces), weighted by importance
+- **Margins** — histogram-based detection for all 4 sides with symmetry adjustments
+- **Page size** — A4 vs Letter from page dimensions
+- **Header alignment** — center vs left from name and meta item positions
+- **Line height** — from consecutive same-font-size Y gaps
+- **Section/entry spacing** — from Y gaps between content blocks
+- **Divider weight** — from horizontal line detection in operator list
+- **Footer** — page numbers, name, custom text from bottom 15% of page
+- **Photo** — detection from embedded images in operator list
 
-## License
+### DOCX Import
 
-MIT
+The DOCX parser uses regex-based XML parsing of `document.xml`, `styles.xml`, and `numbering.xml`:
+- Font family, size, color, bold, italic, underline per run
+- Paragraph alignment, spacing, and indentation
+- Default and named styles with inheritance (`basedOn`)
+- Page margins and size from `document.xml`
+- Bullet/list style detection from `numbering.xml`
+- Falls back to mammoth for simple text extraction if XML parsing fails
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE) for details.
